@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.0.0
+## 1.0.0
 
 - Stellt die eigene Room-Heating-Integration mit Better-Thermostat-Unterstützung wieder bereit.
 - Ergänzt den Wochenplan-Editor um einzelne Freigabe-Schalter pro Heizphase.
