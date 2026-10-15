@@ -40,6 +40,7 @@ class TargetSensor(Base):
             "eco_temperature": o.get(CONF_ECO, 17),
             "vacation_temperature": o.get(CONF_VACATION_TEMP, 16),
             "vacation": self.coordinator.vacation,
+            "schedule_status": self.coordinator.status,
             "schedule": self.coordinator.schedule(),
         }
 
