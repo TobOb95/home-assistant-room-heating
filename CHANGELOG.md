@@ -1,9 +1,9 @@
 # Changelog
 
-## 3.0.0
+## 1.0.0
 
-- Stellt die eigene Room-Heating-Integration mit Better-Thermostat-Unterstützung wieder bereit.
-- Ergänzt den Wochenplan-Editor um einzelne Freigabe-Schalter pro Heizphase.
-- Übernimmt ältere Heizphasen ohne Freigabefeld standardmäßig als aktiviert.
-- Entfernt die Abhängigkeit von Scheduler Card und Scheduler Component.
-- Zeigt Raum- und Solltemperatur sowie den Heizstatus in der eigenen Raumkarte.
+- Erste eigenständige Veröffentlichung von Room Heating.
+- Ergänzt die Konfiguration vorhandener Climate-Entitäten pro Raum.
+- Stellt eine Dashboard-Karte zum Anzeigen und Bearbeiten von Wochenplänen bereit.
+- Unterstützt mehrere Heizphasen pro Wochentag mit unabhängiger Freigabe.
+- Ergänzt Komfort-, Eco- und Urlaubstemperaturen sowie einen Urlaubsmodus.
