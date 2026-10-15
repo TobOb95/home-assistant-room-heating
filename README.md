@@ -1,90 +1,88 @@
-# Room Heating – Wochenplan für Home Assistant
+# Room Heating – Heizungspläne für Home Assistant
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/TobOb95/home-assistant-room-heating/main/assets/room-heating-logo.svg" alt="Room Heating Logo" width="180">
 </p>
 
-Room Heating ergänzt Home Assistant um eine eigene Heizungsintegration mit Wochenplan und Dashboard-Karte. Die Integration verwendet vorhandene Climate-Entitäten, zum Beispiel von Better Thermostat.
+Room Heating ergänzt Home Assistant um eine Integration mit Wochenplänen und einer Dashboard-Karte. Du kannst vorhandene Thermostate aus Home Assistant verwenden, zum Beispiel Climate-Entitäten von Better Thermostat. Room Heating erstellt keine zusätzlichen Thermostate.
 
-**Integrationsversion: 1.0.3**
+**Aktuelle Version: 1.0.3** · [Alle Releases ansehen](https://github.com/TobOb95/home-assistant-room-heating/releases)
 
-## Funktionen
+## Was die Integration bietet
 
-- vorhandene Climate-Entitäten für einzelne Räume verwenden
-- Wochenpläne mit mehreren Heizphasen pro Tag bearbeiten
-- Komfort-, Eco- und Urlaubstemperatur festlegen
-- Urlaubsmodus in der Karte schalten und dessen Status sehen
-- Ist-Temperatur, Thermostat-Sollwert, Heizbetrieb und aktive Zeitplanphase anzeigen
-- Zeitpläne und Temperaturen gemeinsam speichern
+- Wochenpläne mit mehreren Heizphasen pro Tag
+- Komfort-, Eco- und Urlaubstemperatur pro Raum
+- Urlaubsmodus mit Statusanzeige
+- Ist-Temperatur, Thermostat-Sollwert, Heizbetrieb und aktive Zeitplanphase auf der Karte
+- Mehrere Räume und Thermostate in einem Dashboard
+
+Für jeden Raum richtest du einen eigenen Room-Heating-Eintrag ein und fügst eine eigene Karte hinzu. Der Raum verwendet die von dir ausgewählte Climate-Entität.
 
 ## Voraussetzungen
 
 - Home Assistant 2024.11 oder neuer
-- HACS
-- Für lokale Markenbilder in Home Assistant: Home Assistant 2026.3 oder neuer
-- Für automatische Raumvorschläge im Karteneditor: Home Assistant 2026.6 oder neuer
+- [HACS](https://www.hacs.xyz/)
+- Eine vorhandene Climate-Entität für jeden Raum, den du einrichten möchtest
 
-## Erstinstallation
+Zusätzliche Home-Assistant-Funktionen: Lokale Markenbilder werden ab Home Assistant 2026.3 unterstützt. Automatische Raumvorschläge im Karteneditor gibt es ab Home Assistant 2026.6. Die Integration und Karte lassen sich auch ohne diese Komfortfunktionen verwenden.
 
-1. Öffne **HACS → ⋮ → Benutzerdefinierte Repositories**.
-2. Füge `TobOb95/home-assistant-room-heating` als Repository der Kategorie **Integration** hinzu. Wenn das Repository bereits in HACS vorhanden ist, überspringe diesen Schritt.
-3. Öffne das Repository in HACS und wähle **Herunterladen**.
-4. Starte Home Assistant neu.
-5. Öffne **Einstellungen → Geräte & Dienste → Integration hinzufügen** und suche nach **Room Heating**.
-6. Wähle einen Raumnamen, das dazugehörige Thermostat und die gewünschten Komfort- und Eco-Temperaturen.
+## Installation über HACS
 
-Richte für jedes Thermostat einen eigenen Raum ein. Pro Raum verwendest du eine eigene Karteninstanz. Bereits eingerichtete Räume und ihre Zeitpläne müssen bei einem Update nicht neu angelegt werden.
+Room Heating ist ein öffentliches GitHub-Repository. Es ist derzeit nicht Teil der standardmäßig durchsuchbaren HACS-Auswahl. Füge es einmal als benutzerdefiniertes Repository hinzu:
+
+1. Öffne **HACS**.
+2. Öffne das Menü **⋮** und wähle **Benutzerdefinierte Repositories**.
+3. Füge `TobOb95/home-assistant-room-heating` hinzu und wähle als Kategorie **Integration**.
+4. Öffne Room Heating in HACS und wähle **Herunterladen**.
+5. Starte Home Assistant neu.
+6. Öffne **Einstellungen → Geräte & Dienste → Integration hinzufügen**, suche nach **Room Heating** und wähle die Integration aus.
+7. Vergib einen Raumnamen, wähle das passende Thermostat und lege Komfort- und Eco-Temperatur fest.
+
+Wiederhole die Einrichtung für jeden Raum, den du verwalten möchtest. Wähle dabei jeweils die Climate-Entität, die diesen Raum steuert.
 
 ## Karte zum Dashboard hinzufügen
 
-Die Integration stellt die Kartendatei bereit. Prüfe zunächst unter **Einstellungen → Dashboards → Ressourcen**, ob die Room-Heating-Ressource bereits eingetragen ist. Falls nicht, füge sie als **JavaScript-Modul** hinzu:
+1. Öffne das gewünschte Dashboard und wähle **Bearbeiten → Karte hinzufügen**.
+2. Suche nach **Room Heating Wochenplan**.
+3. Wähle den Raum aus und speichere die Karte.
+
+Wenn die Karte nicht in der Auswahl erscheint, prüfe **Einstellungen → Dashboards → Ressourcen**. Die JavaScript-Ressource soll einmal als **JavaScript-Modul** eingetragen sein:
 
 ```text
 /api/room_heating/room-heating-card.js?v=1.0.3
 ```
 
-Wenn dort schon eine ältere Room-Heating-URL eingetragen ist, bearbeite den vorhandenen Eintrag und aktualisiere nur den Wert hinter `v=` auf die installierte Version. Lege keinen zweiten Eintrag für dieselbe Kartendatei an.
+Wenn bereits eine ältere Room-Heating-Ressource eingetragen ist, bearbeite sie und ersetze nur die Versionsnummer nach `v=` durch die installierte Version. Lege keinen doppelten Ressourceneintrag an. Lade danach das Dashboard neu (im Browser mit **Strg+F5**).
 
-Danach:
-
-1. Öffne das gewünschte Dashboard und wähle **Bearbeiten → Karte hinzufügen**.
-2. Wähle **Room Heating Wochenplan**.
-3. Wähle im Karteneditor den Raum aus und speichere die Karte.
-
-Home Assistant kann ab Version 2026.6 beim Hinzufügen außerdem einen passenden Room-Heating-Raum vorschlagen, wenn du zuerst dessen Heiz-Solltemperatursensor auswählst.
-
-Eine manuelle YAML-Konfiguration ist optional:
+Eine YAML-Karte ist ebenfalls möglich. Ersetze die Beispiel-Entity durch den Heiz-Solltemperatursensor des gewünschten Room-Heating-Raums:
 
 ```yaml
 type: custom:room-heating-scheduler-card
 entity: sensor.wohnzimmer_heiz_solltemperatur
 ```
 
-Ersetze die Beispiel-Entity durch den automatisch angelegten Heiz-Solltemperatursensor deines Raums.
+Ab Home Assistant 2026.6 kann der Karteneditor außerdem einen passenden Raum vorschlagen, wenn du zuerst dessen Heiz-Solltemperatursensor auswählst.
 
-## Room Heating aktualisieren
+## Zeitplan und Temperaturen
 
-1. Öffne **HACS → Integrationen → Room Heating**.
-2. Wähle **Aktualisieren**. Wenn kein Update angeboten wird, öffne das Menü **⋮** des Repositorys und wähle **Erneut herunterladen** beziehungsweise lade die neueste Version herunter.
-3. Warte, bis HACS den Download abgeschlossen hat.
-4. Starte Home Assistant neu, damit Integration und Karten-Datei aus der aktualisierten Version geladen werden.
-5. Öffne **Einstellungen → Dashboards → Ressourcen** und ändere bei Bedarf die vorhandene Karten-URL auf die neue Versionsnummer hinter `v=` (zum Beispiel `v=1.0.3`). Die Versionsnummer in der URL leert den Browsercache für die Karten-Datei.
-6. Lade das Dashboard im Browser mit **Strg+F5** neu. In der Home-Assistant-App lade die Oberfläche neu oder starte die App erneut.
+- Während einer aktivierten Heizphase verwendet Room Heating die zugehörige Solltemperatur.
+- Außerhalb der aktivierten Heizphasen gilt die Eco-Temperatur.
+- Bei aktivem Urlaubsmodus gilt die Urlaubstemperatur.
+- Room Heating übergibt den Sollwert an die ausgewählte Climate-Entität. Diese Entität beziehungsweise ihre Thermostat-Integration übernimmt die eigentliche Regelung.
 
-Du musst die Integration oder Räume nach einem normalen Update nicht entfernen und neu einrichten. Die gespeicherten Zeitpläne bleiben erhalten.
+Du kannst Zeitpläne, Temperaturen und den Urlaubsmodus auf der Karte bearbeiten. Änderungen werden erst übernommen, wenn du sie speicherst. Vermeide eine zusätzliche Automation, die gleichzeitig den Sollwert derselben Climate-Entität verändert.
 
-## Versionsnummer in HACS
+## Aktualisierung
 
-HACS zeigt als verfügbare Version die neueste veröffentlichte GitHub-Release-Version mit ihrem Tag an. Die Versionsnummer in der Integrationsdatei allein veröffentlicht noch keine HACS-Version. Dieses Projekt verwendet Tags im Format `vMAJOR.MINOR.PATCH`, zum Beispiel `v1.0.3`. Ohne GitHub-Release zeigt HACS stattdessen eine kurze Commit-Kennung an.
+1. Öffne **HACS → Integrationen → Room Heating** und installiere das angebotene Update.
+2. Warte, bis HACS den Download abgeschlossen hat, und starte Home Assistant neu.
+3. Prüfe unter **Einstellungen → Dashboards → Ressourcen**, ob eine manuell eingetragene Room-Heating-Ressource noch die Versionsnummer der vorherigen Installation enthält. Aktualisiere sie bei Bedarf auf die Version aus HACS, zum Beispiel `v=1.0.3`.
+4. Lade das Dashboard neu. Im Browser geht das mit **Strg+F5**; in der Home-Assistant-App kannst du die Oberfläche neu laden oder die App erneut starten.
 
-## Logo in Home Assistant und HACS
+Du musst die Integration oder Räume für ein normales Update nicht entfernen und erneut einrichten. Die gespeicherten Zeitpläne und Einstellungen bleiben erhalten.
 
-Das SVG-Logo wird oben in dieser HACS-Repositorybeschreibung angezeigt. Die Integration enthält zusätzlich Markenbilder unter `custom_components/room_heating/brand/`, damit Home Assistant sie an den unterstützten Stellen verwenden kann.
+## Version und Lizenz
 
-Falls das Symbol auf der HACS-Repository-Kachel trotz aktualisierter Integration noch als Platzhalter erscheint, kann HACS das lokale Markenbild derzeit möglicherweise nicht in dieser Kachel anzeigen. Das Logo bleibt in der Repositorybeschreibung und – ab Home Assistant 2026.3 – an den von Home Assistant unterstützten Integrationsstellen verfügbar. Nach einem Update kannst du HACS neu laden; du musst die Integration dafür nicht neu konfigurieren.
+HACS zeigt die neueste veröffentlichte GitHub-Version anhand des Release-Tags an, zum Beispiel `v1.0.3`. Die Versionsnummer in der Integrationsdatei allein veröffentlicht kein HACS-Update.
 
-## Zeitplanverhalten
-
-Während einer aktiven Heizphase wird deren Solltemperatur verwendet. Außerhalb aktivierter Komfortphasen gilt die Eco-Temperatur. Bei eingeschaltetem Urlaubsmodus gilt die Urlaubstemperatur. Room Heating übergibt den Sollwert an die ausgewählte Climate-Entität; deren Thermostat-Integration übernimmt die Regelung.
-
-Vermeide eine zusätzliche Automation, die gleichzeitig denselben Thermostat-Sollwert verändert.
+Das GitHub-Repository ist öffentlich einsehbar und kann als benutzerdefiniertes HACS-Repository eingebunden werden. Aktuell enthält es keine Lizenzdatei. Die öffentliche Sichtbarkeit allein legt keine zusätzlichen Nutzungs- oder Weitergaberechte fest.
