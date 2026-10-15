@@ -697,7 +697,7 @@ class RoomHeatingSchedulerCard extends HTMLElement {
     this.shadowRoot
       .querySelectorAll("input[data-day]")
       .forEach((input) => {
-        input.onchange = () => {
+        input.oninput = input.onchange = () => {
           const day = input.dataset.day;
           const index = Number(input.dataset.i);
 
@@ -727,7 +727,7 @@ class RoomHeatingSchedulerCard extends HTMLElement {
       });
 
     this.shadowRoot.querySelectorAll(".temps input").forEach((input) => {
-      input.onchange = () => {
+      input.oninput = input.onchange = () => {
         this._dirty = true;
         this._updateSaveButton();
       };
