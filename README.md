@@ -19,8 +19,7 @@ Nach der Installation die Datei `room-heating-card.js` als Lovelace-Ressource vo
 `/api/room_heating/room-heating-card.js` einbinden, falls HACS sie nicht automatisch registriert.
 Alternativ kann die Karte über den Dashboard-Karten-Editor als `custom:room-heating-scheduler-card` hinzugefügt werden.
 
-Die Karte verwendet als `entity` den Sensor **Heiz-Solltemperatur** eines Raums, z. B.:
-`room_heating.raum_heiz_solltemperatur` (die tatsächliche Entity-ID hängt vom Raum ab).
+Die Karte verwendet als `entity` die Entität **Heiz-Solltemperatur** des gewünschten Raums. Wähle die tatsächliche Entity-ID in Home Assistant aus; sie hängt vom Raum und der Entity-ID-Konfiguration ab.
 
 ## Funktionen
 - ein Climate-Thermostat pro Raum
