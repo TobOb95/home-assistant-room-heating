@@ -1,7 +1,7 @@
 {
   "domain": "room_heating",
   "name": "Room Heating Scheduler",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "documentation": "https://github.com/TobOb95/home-assistant-room-heating",
   "issue_tracker": "https://github.com/TobOb95/home-assistant-room-heating/issues",
   "codeowners": [
