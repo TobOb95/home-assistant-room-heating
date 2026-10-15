@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.0
+- Projekt von der eigenen Room-Heating-Integration auf eine eigenständige Lovelace-Karte für Better Thermostat umgestellt.
+- Schedule-Helfer und Blueprint-Automation übernehmen die Zeitsteuerung.
+- Raumtemperatur, Sollwert, Heizstatus und optionale Better-Thermostat-Merkmale in einer kompakten Karte.
+- Freigabe-Schalter pro Raum und direkte Anpassung des Sollwerts.
+
 ## 2.4.2
 - Add Home Assistant integration icon assets for the integration and HACS.
 
@@ -10,15 +16,3 @@
 ## 2.4.0
 - Added a visual card editor with automatic room selection.
 - Added Home Assistant card suggestions for Room Heating target sensors.
-
-## 2.3.0
-- Validate schedules and temperature limits consistently, including service calls.
-- Reapply the scheduled setpoint when the thermostat is changed manually.
-- Save card schedule and temperature edits in one service call.
-
-## 2.2.0
-- Visual weekly scheduler card added.
-- Vacation mode is persisted in config entry options.
-- Manifest documentation and issue tracker fixed.
-- Room heating sensor exposes schedule and temperature settings to the card.
-- Improved HACS-ready repository structure.
