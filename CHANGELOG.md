@@ -5,6 +5,10 @@
 
 # Changelog
 
+## 2.4.0
+- Added a visual card editor with automatic room selection.
+- Added Home Assistant card suggestions for Room Heating target sensors.
+
 ## 2.2.0
 - Visual weekly scheduler card added.
 - Vacation mode is persisted in config entry options.
