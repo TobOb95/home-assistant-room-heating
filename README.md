@@ -1,58 +1,53 @@
 # Room Heating – Better Thermostat Wochenplan
 
 <p align="center">
-  <img src="assets/room-heating-logo.svg" alt="Eigenes Room-Heating-Hauslogo" width="160">
+  <img src="assets/room-heating-logo.svg" alt="Room Heating Logo" width="160">
 </p>
 
-Eine eigenständige Home-Assistant-Integration mit eigener Wochenplan-Karte für vorhandene Climate-Geräte, zum Beispiel von [Better Thermostat](https://github.com/KartoffelToby/better_thermostat). Zeitpläne werden in der Karte erstellt und bearbeitet. Jeder Zeitblock hat einen eigenen Freigabe-Schalter.
+Room Heating ergänzt Home Assistant um eine eigene Wochenplan-Integration und eine passende Dashboard-Karte. Bestehende Climate-Entitäten können direkt verwendet werden, zum Beispiel Thermostate von Better Thermostat.
 
 ## Funktionen
 
 - vorhandene Climate-Entität pro Raum verwenden
-- Wochenplan mit beliebig vielen Heizphasen pro Wochentag
-- Startzeit, Endzeit und Solltemperatur direkt in der Karte bearbeiten
-- jede Heizphase unabhängig aktivieren oder pausieren
-- Komfort-, Eco- und Urlaubstemperatur
-- Urlaubsmodus als Home-Assistant-Schalter
-- Raum- und Solltemperatur sowie Heizstatus von Better Thermostat in der Karte
-- Änderungen werden über Integration-Dienste geprüft und gespeichert
+- Wochenplan mit mehreren Heizphasen pro Wochentag
+- Startzeit, Endzeit und Solltemperatur in der Karte bearbeiten
+- einzelne Heizphasen unabhängig aktivieren oder pausieren
+- Komfort-, Eco- und Urlaubstemperatur festlegen
+- Urlaubsmodus über die Karte schalten
+- Raumtemperatur, Sollwert und Heizstatus anzeigen
+- Zeitpläne und Temperaturen gemeinsam speichern und validieren
 
 ## Installation über HACS
 
 1. Öffne **HACS → ⋮ → Benutzerdefinierte Repositories**.
 2. Füge `TobOb95/home-assistant-room-heating` hinzu und wähle die Kategorie **Integration**.
-3. Installiere **Room Heating Scheduler** und starte Home Assistant neu.
+3. Installiere **Room Heating** und starte Home Assistant neu.
 4. Füge die Integration unter **Einstellungen → Geräte & Dienste → Integration hinzufügen** hinzu.
-5. Wähle einen Namen und die vorhandene Better-Thermostat-Climate-Entität.
-6. Füge die Kartendatei als Dashboard-Ressource hinzu, falls sie nicht bereits registriert wurde:
-
-   `/api/room_heating/room-heating-card.js?v=3.0.0`
-
-   Ressourcentyp: **JavaScript-Modul**.
+5. Wähle einen Raumnamen und eine vorhandene Climate-Entität.
 
 ## Karte hinzufügen
 
-Füge in einem Dashboard eine **Manuelle Karte** mit folgender Konfiguration ein. Ersetze die Entity-ID durch den Heiz-Solltemperatur-Sensor des Raums:
+Füge die Kartendatei als Dashboard-Ressource hinzu, falls Home Assistant sie nicht bereits registriert hat:
+
+`/api/room_heating/room-heating-card.js?v=1.0.0`
+
+Ressourcentyp: **JavaScript-Modul**.
+
+Füge anschließend in einem Dashboard eine manuelle Karte ein. Ersetze die Entity-ID durch den von Room Heating erstellten Sensor des Raums:
 
 ```yaml
 type: custom:room-heating-scheduler-card
 entity: sensor.wohnzimmer_heiz_solltemperatur
 ```
 
-Beim visuellen Hinzufügen der Karte kannst du den Raum im Editor auswählen. Der Editor zeigt Better-Thermostat-Raumtemperatur und Sollwert; darunter lassen sich Wochentage und Heizphasen einrichten. Mit **+ Phase** fügst du eine weitere Phase hinzu. Der Schiebeschalter in einer Zeile pausiert nur diese Heizphase. **Speichern** übernimmt Zeitplan und Temperaturen gemeinsam.
+Beim visuellen Hinzufügen der Karte kann ein eingerichteter Raum im Editor ausgewählt werden. Mit **+ Phase** fügst du eine Heizphase hinzu. Der Schalter in einer Zeile aktiviert oder pausiert nur diese Phase. **Speichern** übernimmt den Zeitplan und die Temperaturen.
 
-## Verhalten des Zeitplans
+## Verhalten
 
-Die aktive Heizphase mit passendem Wochentag und aktueller Uhrzeit bestimmt den Sollwert. Außerhalb aktivierter Phasen gilt die Eco-Temperatur. Bei eingeschaltetem Urlaubsmodus gilt die Urlaubstemperatur. Better Thermostat bleibt für Regelung und Thermostatfunktionen zuständig; Room Heating übergibt nur den Sollwert an die gewählte Climate-Entität.
+Während einer aktiven Heizphase gilt deren Solltemperatur. Außerhalb aktivierter Phasen wird die Eco-Temperatur verwendet. Bei eingeschaltetem Urlaubsmodus gilt die Urlaubstemperatur. Room Heating übergibt den Sollwert an die ausgewählte Climate-Entität; die Thermostat-Integration bleibt für die Regelung zuständig.
 
-> Verwende nicht gleichzeitig eine zweite Automation oder Integration, die denselben Thermostat-Sollwert steuert.
-
-## Migration von der bisherigen Version
-
-Room Heating speichert die vorhandenen Einstellungen in der Integration. Beim Update auf 3.0.0 werden die gespeicherten Wochenpläne weiterverwendet. Ältere Heizphasen ohne Freigabe-Feld gelten automatisch als aktiviert. Ein Zeitblock mit `enabled: false` bleibt pausiert.
-
-Falls zusätzlich Scheduler Card oder Scheduler Component installiert sind, entferne oder deaktiviere deren Zeitpläne für dieselben Thermostate, bevor Room Heating den Sollwert übernimmt.
+Verwende nicht gleichzeitig eine weitere Automation, die denselben Thermostat-Sollwert steuert.
 
 ## Herkunft
 
-Die Integration, Wochenplan-Karte und das Logo in diesem Repository sind eigenständige Bestandteile dieses Projekts. Scheduler Card und Scheduler Component werden nicht benötigt und ihr Code oder Design wird nicht verwendet. Better Thermostat ist eine separate Integration; Room Heating nutzt lediglich die von Home Assistant bereitgestellte Climate-Schnittstelle.
+Die Integration, der Wochenplan und das Logo sind eigenständige Bestandteile dieses Projekts. Die Anbindung an Thermostate erfolgt über die von Home Assistant bereitgestellte Climate-Schnittstelle.
