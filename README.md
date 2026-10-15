@@ -1,82 +1,58 @@
-# Better Thermostat Raumkarte
+# Room Heating – Better Thermostat Wochenplan
 
 <p align="center">
-  <img src="assets/room-heating-logo.svg" alt="Eigenständiges Haus- und Heizsymbol" width="180">
+  <img src="assets/room-heating-logo.svg" alt="Eigenes Room-Heating-Hauslogo" width="160">
 </p>
 
-Eine eigenständige Home-Assistant-Dashboard-Karte für Räume mit [Better Thermostat](https://github.com/KartoffelToby/better_thermostat). Sie zeigt Raum- und Solltemperatur, Heizstatus und – sofern von der Climate-Entität bereitgestellt – Luftfeuchte und Fensterstatus. Der Sollwert lässt sich in 0,5-°C-Schritten anpassen.
+Eine eigenständige Home-Assistant-Integration mit eigener Wochenplan-Karte für vorhandene Climate-Geräte, zum Beispiel von [Better Thermostat](https://github.com/KartoffelToby/better_thermostat). Zeitpläne werden in der Karte erstellt und bearbeitet. Jeder Zeitblock hat einen eigenen Freigabe-Schalter.
 
-Zeitpläne werden über die separat installierten Projekte **Scheduler Component** und **Scheduler Card** erstellt und verwaltet. Diese Repository enthält keinen Scheduler-Quellcode. Die Raumkarte und die beiden Drittanbieter-Projekte bleiben getrennte Komponenten.
+## Funktionen
 
-## Voraussetzungen
+- vorhandene Climate-Entität pro Raum verwenden
+- Wochenplan mit beliebig vielen Heizphasen pro Wochentag
+- Startzeit, Endzeit und Solltemperatur direkt in der Karte bearbeiten
+- jede Heizphase unabhängig aktivieren oder pausieren
+- Komfort-, Eco- und Urlaubstemperatur
+- Urlaubsmodus als Home-Assistant-Schalter
+- Raum- und Solltemperatur sowie Heizstatus von Better Thermostat in der Karte
+- Änderungen werden über Integration-Dienste geprüft und gespeichert
 
-- Home Assistant mit einer vorhandenen Better-Thermostat-Climate-Entität
-- HACS
-- [Scheduler Component](https://github.com/nielsfaber/scheduler-component) als Backend für Schedule-Entitäten
-- [Scheduler Card](https://github.com/nielsfaber/scheduler-card) als Zeitplan-Editor im Dashboard
-
-## Installation
-
-### Better Thermostat Raumkarte
+## Installation über HACS
 
 1. Öffne **HACS → ⋮ → Benutzerdefinierte Repositories**.
-2. Füge `TobOb95/home-assistant-room-heating` hinzu und wähle **Dashboard** als Kategorie.
-3. Installiere **Better Thermostat Raumkarte**.
-4. Lade das Home-Assistant-Frontend neu.
+2. Füge `TobOb95/home-assistant-room-heating` hinzu und wähle die Kategorie **Integration**.
+3. Installiere **Room Heating Scheduler** und starte Home Assistant neu.
+4. Füge die Integration unter **Einstellungen → Geräte & Dienste → Integration hinzufügen** hinzu.
+5. Wähle einen Namen und die vorhandene Better-Thermostat-Climate-Entität.
+6. Füge die Kartendatei als Dashboard-Ressource hinzu, falls sie nicht bereits registriert wurde:
 
-Falls HACS die Ressource nicht automatisch registriert, füge unter **Einstellungen → Dashboards → Ressourcen** die JavaScript-Datei als Modul hinzu:
+   `/api/room_heating/room-heating-card.js?v=3.0.0`
 
-    /hacsfiles/home-assistant-room-heating/home-assistant-room-heating.js
+   Ressourcentyp: **JavaScript-Modul**.
 
-### Scheduler Component und Scheduler Card
+## Karte hinzufügen
 
-Installiere beide Projekte getrennt nach ihren jeweiligen Anleitungen:
-
-1. Füge [Scheduler Component](https://github.com/nielsfaber/scheduler-component) in HACS als **Integration** hinzu.
-2. Installiere die Integration, starte Home Assistant neu und füge **Scheduler** unter **Einstellungen → Geräte & Dienste → Integration hinzufügen** hinzu.
-3. Füge [Scheduler Card](https://github.com/nielsfaber/scheduler-card) in HACS als **Dashboard** hinzu und installiere sie.
-4. Lade das Frontend neu. Die Scheduler Card braucht die Scheduler Component als Backend.
-
-Folge bei Versions- oder Installationsfragen den offiziellen Anleitungen der jeweiligen Projekte.
-
-## Dashboard einrichten
-
-Füge eine native `vertical-stack`-Karte mit einer Better-Thermostat-Raumkarte und darunter einer Scheduler Card ein. Ersetze `climate.better_thermostat_wohnzimmer` durch deine tatsächliche Climate-Entität:
+Füge in einem Dashboard eine **Manuelle Karte** mit folgender Konfiguration ein. Ersetze die Entity-ID durch den Heiz-Solltemperatur-Sensor des Raums:
 
 ```yaml
-type: vertical-stack
-cards:
-  - type: custom:better-thermostat-room-card
-    entity: climate.better_thermostat_wohnzimmer
-    name: Wohnzimmer
-  - type: custom:scheduler-card
-    include:
-      - climate.better_thermostat_wohnzimmer
-    discover_existing: false
-    title: Heizplan Wohnzimmer
+type: custom:room-heating-scheduler-card
+entity: sensor.wohnzimmer_heiz_solltemperatur
 ```
 
-Du kannst die Karten auch über den Dashboard-Editor hinzufügen: erst **Better Thermostat Raumkarte**, danach **Scheduler Card**. In der Scheduler Card kannst du Zeitpläne erstellen, bearbeiten, kopieren, löschen und einzeln aktivieren oder pausieren. Wähle bei einer neuen Regel als Ziel die Better-Thermostat-Climate-Entität und als Aktion das Setzen der Temperatur.
+Beim visuellen Hinzufügen der Karte kannst du den Raum im Editor auswählen. Der Editor zeigt Better-Thermostat-Raumtemperatur und Sollwert; darunter lassen sich Wochentage und Heizphasen einrichten. Mit **+ Phase** fügst du eine weitere Phase hinzu. Der Schiebeschalter in einer Zeile pausiert nur diese Heizphase. **Speichern** übernimmt Zeitplan und Temperaturen gemeinsam.
 
-Die Scheduler Card ist ein eigenständiges Drittanbieterprojekt. Ihre Oberfläche und Bedienung stammen aus diesem Projekt und werden hier weder kopiert noch verändert. Für deren Optionen gelten die Dokumentation und Lizenz des jeweiligen Projekts.
+## Verhalten des Zeitplans
 
-## Wechsel von Room Heating Scheduler
+Die aktive Heizphase mit passendem Wochentag und aktueller Uhrzeit bestimmt den Sollwert. Außerhalb aktivierter Phasen gilt die Eco-Temperatur. Bei eingeschaltetem Urlaubsmodus gilt die Urlaubstemperatur. Better Thermostat bleibt für Regelung und Thermostatfunktionen zuständig; Room Heating übergibt nur den Sollwert an die gewählte Climate-Entität.
 
-Die alte Integration und Scheduler Component dürfen nicht gleichzeitig Sollwerte für denselben Thermostat setzen.
+> Verwende nicht gleichzeitig eine zweite Automation oder Integration, die denselben Thermostat-Sollwert steuert.
 
-1. Notiere oder sichere die bisherigen Zeitpläne.
-2. Deinstalliere **Room Heating Scheduler** in HACS und entferne die Integration unter **Einstellungen → Geräte & Dienste**.
-3. Starte Home Assistant neu und prüfe, dass keine alte Automation mehr denselben Thermostat steuert.
-4. Installiere Scheduler Component und Scheduler Card wie oben beschrieben.
-5. Erstelle zunächst einen einzelnen Zeitplan für einen Thermostat, kontrolliere Auslöser und Solltemperatur und übertrage danach die übrigen Pläne.
+## Migration von der bisherigen Version
 
-## Hinweise
+Room Heating speichert die vorhandenen Einstellungen in der Integration. Beim Update auf 3.0.0 werden die gespeicherten Wochenpläne weiterverwendet. Ältere Heizphasen ohne Freigabe-Feld gelten automatisch als aktiviert. Ein Zeitblock mit `enabled: false` bleibt pausiert.
 
-- Diese Karte speichert oder steuert keine Zeitpläne. Die Scheduler Card verwaltet die Zeitpläne über Scheduler Component.
-- Die +/- Tasten rufen `climate.set_temperature` für die ausgewählte Better-Thermostat-Entität auf.
-- Better Thermostat kann einen Sollwert durch eigene Fenster-, Präsenz- oder Betriebslogik später verändern. Prüfe deshalb eine Regel zunächst mit einem einzelnen Raum.
-- Die angezeigten optionalen Werte richten sich nach den Attributen, die deine Better-Thermostat-Climate-Entität bereitstellt.
+Falls zusätzlich Scheduler Card oder Scheduler Component installiert sind, entferne oder deaktiviere deren Zeitpläne für dieselben Thermostate, bevor Room Heating den Sollwert übernimmt.
 
-## Lizenzen und Herkunft
+## Herkunft
 
-Scheduler Card und Scheduler Component werden als separate Drittanbieterprojekte installiert. Ihr Quellcode, ihre Oberfläche und ihre Assets werden hier nicht eingebettet oder übernommen. Die jeweiligen Lizenzbedingungen gelten im Original-Repository. Better Thermostat bleibt ebenfalls ein separates Projekt mit eigenen Lizenzbedingungen. In diesem Repository liegt derzeit keine LICENSE-Datei; es wird daher hier keine Lizenz für fremde Projekte beansprucht. Vor einer öffentlichen Weiterverwendung dieses Karten-Codes sollte der Repository-Eigentümer die gewünschte Lizenz festlegen.
+Die Integration, Wochenplan-Karte und das Logo in diesem Repository sind eigenständige Bestandteile dieses Projekts. Scheduler Card und Scheduler Component werden nicht benötigt und ihr Code oder Design wird nicht verwendet. Better Thermostat ist eine separate Integration; Room Heating nutzt lediglich die von Home Assistant bereitgestellte Climate-Schnittstelle.
