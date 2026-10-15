@@ -25,22 +25,30 @@ Room Heating ergänzt Home Assistant um eine eigene Wochenplan-Integration und e
 4. Füge die Integration unter **Einstellungen → Geräte & Dienste → Integration hinzufügen** hinzu.
 5. Wähle einen Raumnamen und eine vorhandene Climate-Entität.
 
-## Karte hinzufügen
+Beim Einrichten eines Raums erstellt die Integration die zugehörigen Room-Heating-Sensoren automatisch.
 
-Füge die Kartendatei als Dashboard-Ressource hinzu, falls Home Assistant sie nicht bereits registriert hat:
+## Karte im Dashboard
+
+Die Integration stellt die Kartendatei bereit. Damit Home Assistant sie im Dashboard-Editor laden kann, füge sie einmalig unter **Einstellungen → Dashboards → Ressourcen** als **JavaScript-Modul** hinzu:
 
 `/api/room_heating/room-heating-card.js?v=1.0.0`
 
-Ressourcentyp: **JavaScript-Modul**.
+Anschließend brauchst du die Entity-ID nicht in YAML einzutragen:
 
-Füge anschließend in einem Dashboard eine manuelle Karte ein. Ersetze die Entity-ID durch den von Room Heating erstellten Sensor des Raums:
+1. Öffne das Dashboard und wähle **Bearbeiten → Karte hinzufügen**.
+2. Wähle **Room Heating Wochenplan**.
+3. Wähle im Karteneditor den gewünschten Raum aus und speichere.
+
+Ab Home Assistant 2026.6 kann Home Assistant die Karte zusätzlich vorschlagen, wenn du beim Hinzufügen zuerst den Room-Heating-Heiz-Solltemperatursensor des Raums auswählst.
+
+YAML ist nur eine Alternative, wenn du die Karte manuell konfigurierst. Ersetze dabei die Beispiel-Entity durch den automatisch erstellten Heiz-Solltemperatursensor deines Raums:
 
 ```yaml
 type: custom:room-heating-scheduler-card
 entity: sensor.wohnzimmer_heiz_solltemperatur
 ```
 
-Beim visuellen Hinzufügen der Karte kann ein eingerichteter Raum im Editor ausgewählt werden. Mit **+ Phase** fügst du eine Heizphase hinzu. Der Schalter in einer Zeile aktiviert oder pausiert nur diese Phase. **Speichern** übernimmt den Zeitplan und die Temperaturen.
+Mit **+ Phase** fügst du im Karteneditor eine Heizphase hinzu. Der Schalter in einer Zeile aktiviert oder pausiert nur diese Phase. **Speichern** übernimmt den Zeitplan und die Temperaturen.
 
 ## Verhalten
 
