@@ -1,5 +1,5 @@
 {
-  "name": "Better Thermostat Heizplan-Karte",
+  "name": "Better Thermostat Raumkarte",
   "filename": "home-assistant-room-heating.js",
   "content_in_root": true,
   "render_readme": true
