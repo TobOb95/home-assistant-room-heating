@@ -1,3 +1,8 @@
+## 2.3.0
+- Validate schedules and temperature limits consistently, including service calls.
+- Reapply the scheduled setpoint when the thermostat is changed manually.
+- Save card schedule and temperature edits in one service call.
+
 # Changelog
 
 ## 2.2.0
