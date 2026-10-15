@@ -1,5 +1,6 @@
 """Tests for room heating schedule validation."""
 import json
+from datetime import datetime
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 import unittest
@@ -14,6 +15,7 @@ _SPEC = spec_from_file_location("room_heating_validation", _MODULE_PATH)
 _VALIDATION = module_from_spec(_SPEC)
 _SPEC.loader.exec_module(_VALIDATION)
 validate_schedule = _VALIDATION.validate_schedule
+target_for_schedule = _VALIDATION.target_for_schedule
 
 
 class ValidateScheduleTests(unittest.TestCase):
@@ -46,6 +48,26 @@ class ValidateScheduleTests(unittest.TestCase):
             validate_schedule({"0": [
                 {"start": "06:00", "end": "08:00", "temperature": 20, "enabled": "false"},
             ]})
+
+    def test_resolves_only_enabled_periods(self):
+        now = datetime(2026, 10, 12, 7, 0)
+        schedule = validate_schedule({"0": [
+            {"start": "06:00", "end": "08:00", "temperature": 21, "enabled": False},
+        ]})
+        self.assertEqual(target_for_schedule(schedule, now, 17), (17.0, "eco"))
+
+        schedule["0"][0]["enabled"] = True
+        self.assertEqual(target_for_schedule(schedule, now, 17), (21.0, "comfort"))
+
+    def test_vacation_temperature_takes_precedence(self):
+        now = datetime(2026, 10, 12, 7, 0)
+        schedule = validate_schedule({"0": [
+            {"start": "06:00", "end": "08:00", "temperature": 21},
+        ]})
+        self.assertEqual(
+            target_for_schedule(schedule, now, 17, vacation=True, vacation_temperature=16),
+            (16.0, "vacation"),
+        )
 
     def test_rejects_invalid_input(self):
         schedules = [
