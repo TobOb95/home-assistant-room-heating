@@ -5,6 +5,10 @@
 
 # Changelog
 
+## 2.4.1
+- Disable long-lived caching for the custom card resource to make frontend updates available promptly.
+- Document a versioned resource URL for manual Lovelace resource registration.
+
 ## 2.4.0
 - Added a visual card editor with automatic room selection.
 - Added Home Assistant card suggestions for Room Heating target sensors.
