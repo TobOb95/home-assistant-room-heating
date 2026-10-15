@@ -1,4 +1,4 @@
-/* Room Heating Scheduler visual weekly card - v2.2.2 */
+/* Room Heating Scheduler visual weekly card - v2.3.0 */
 
 class RoomHeatingSchedulerCard extends HTMLElement {
   constructor() {
@@ -696,18 +696,10 @@ class RoomHeatingSchedulerCard extends HTMLElement {
     try {
       await this._hass.callService(
         "room_heating",
-        "set_schedule",
+        "set_settings",
         {
           entry_id: entryId,
           schedule: this._schedule,
-        }
-      );
-
-      await this._hass.callService(
-        "room_heating",
-        "set_temperatures",
-        {
-          entry_id: entryId,
           comfort_temperature:
             comfortTemperature,
           eco_temperature:

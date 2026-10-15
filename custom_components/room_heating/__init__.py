@@ -20,6 +20,7 @@ from .const import (
     DOMAIN,
 )
 from .coordinator import RoomHeatingCoordinator
+from .validation import validate_schedule
 
 PLATFORMS = ["sensor", "switch"]
 
@@ -42,9 +43,14 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         if coordinator is None:
             return
 
+        try:
+            schedule = validate_schedule(call.data["schedule"])
+        except (ValueError, TypeError, KeyError) as err:
+            raise vol.Invalid(f"Invalid heating schedule: {err}") from err
+
         options = {
             **coordinator.entry.options,
-            CONF_SCHEDULE: call.data["schedule"],
+            CONF_SCHEDULE: schedule,
         }
 
         hass.config_entries.async_update_entry(
@@ -75,6 +81,25 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
         await coordinator.async_update()
 
+    async def set_settings(call: ServiceCall) -> None:
+        """Validate and persist card changes together."""
+        coordinator = hass.data.get(DOMAIN, {}).get(call.data["entry_id"])
+        if coordinator is None:
+            return
+        try:
+            schedule = validate_schedule(call.data["schedule"])
+        except (ValueError, TypeError, KeyError) as err:
+            raise vol.Invalid(f"Invalid heating schedule: {err}") from err
+        options = {
+            **coordinator.entry.options,
+            CONF_SCHEDULE: schedule,
+            CONF_COMFORT: call.data["comfort_temperature"],
+            CONF_ECO: call.data["eco_temperature"],
+            CONF_VACATION_TEMP: call.data["vacation_temperature"],
+        }
+        hass.config_entries.async_update_entry(coordinator.entry, options=options)
+        await coordinator.async_update()
+
     async def set_vacation(call: ServiceCall) -> None:
         coordinator = hass.data.get(DOMAIN, {}).get(call.data["entry_id"])
         if coordinator is None:
@@ -101,7 +126,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         set_schedule,
         schema=vol.Schema({
             vol.Required("entry_id"): str,
-            vol.Required("schedule"): dict,
+            vol.Required("schedule"): vol.Any(dict, str),
         }),
     )
 
@@ -111,12 +136,25 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         set_temperatures,
         schema=vol.Schema({
             vol.Required("entry_id"): str,
-            vol.Required("comfort_temperature"): vol.Coerce(float),
-            vol.Required("eco_temperature"): vol.Coerce(float),
+            vol.Required("comfort_temperature"): vol.All(vol.Coerce(float), vol.Range(min=5, max=30)),
+            vol.Required("eco_temperature"): vol.All(vol.Coerce(float), vol.Range(min=5, max=30)),
             vol.Optional(
                 "vacation_temperature",
                 default=16,
-            ): vol.Coerce(float),
+            ): vol.All(vol.Coerce(float), vol.Range(min=5, max=25)),
+        }),
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        "set_settings",
+        set_settings,
+        schema=vol.Schema({
+            vol.Required("entry_id"): str,
+            vol.Required("schedule"): vol.Any(dict, str),
+            vol.Required("comfort_temperature"): vol.All(vol.Coerce(float), vol.Range(min=5, max=30)),
+            vol.Required("eco_temperature"): vol.All(vol.Coerce(float), vol.Range(min=5, max=30)),
+            vol.Required("vacation_temperature"): vol.All(vol.Coerce(float), vol.Range(min=5, max=25)),
         }),
     )
 

@@ -15,6 +15,7 @@ from .const import (
     CONF_VACATION_TEMP,
     DEFAULT_SCHEDULE,
 )
+from .validation import validate_schedule
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -47,7 +48,11 @@ class RoomHeatingCoordinator(DataUpdateCoordinator):
             except (ValueError, TypeError):
                 schedule = DEFAULT_SCHEDULE
 
-        return schedule if isinstance(schedule, dict) else DEFAULT_SCHEDULE
+        try:
+            return validate_schedule(schedule)
+        except (ValueError, TypeError, KeyError):
+            _LOGGER.error("Invalid schedule stored for %s; using default", self.entry.entry_id)
+            return DEFAULT_SCHEDULE
 
     def target_temperature(self, now=None):
         now = now or datetime.now().astimezone()
@@ -70,11 +75,10 @@ class RoomHeatingCoordinator(DataUpdateCoordinator):
     async def async_update(self, now=None):
         target, status = self.target_temperature(now)
         climate_entity = self.opts[CONF_CLIMATE]
-        self.status = status
-
         state = self.hass.states.get(climate_entity)
 
         if state is None or state.state in ("unknown", "unavailable"):
+            self.status = "unavailable"
             self.async_set_updated_data({
                 "target": target,
                 "status": "unavailable",
@@ -82,9 +86,12 @@ class RoomHeatingCoordinator(DataUpdateCoordinator):
             return
 
         try:
+            current_target = state.attributes.get("temperature")
             if (
                 self.last_target is None
                 or abs(self.last_target - target) >= 0.1
+                or not isinstance(current_target, (int, float))
+                or abs(float(current_target) - target) >= 0.1
             ):
                 await self.hass.services.async_call(
                     "climate",
@@ -101,6 +108,7 @@ class RoomHeatingCoordinator(DataUpdateCoordinator):
                 "target": target,
                 "status": status,
             })
+            self.status = status
 
         except Exception:
             _LOGGER.exception(
@@ -111,6 +119,7 @@ class RoomHeatingCoordinator(DataUpdateCoordinator):
                 "target": target,
                 "status": "error",
             })
+            self.status = "error"
 
     async def async_set_vacation(self, enabled):
         """Set vacation mode and persist it."""

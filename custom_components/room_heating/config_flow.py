@@ -10,32 +10,17 @@ from .const import (
     CONF_CLIMATE, CONF_COMFORT, CONF_ECO, CONF_SCHEDULE,
     CONF_VACATION_TEMP, DEFAULT_SCHEDULE, DOMAIN
 )
+from .validation import validate_schedule
 
 DAY_NAMES = {
     "0": "Montag", "1": "Dienstag", "2": "Mittwoch",
     "3": "Donnerstag", "4": "Freitag", "5": "Samstag", "6": "Sonntag"
 }
 
-def _parse_periods(value):
-    parsed = json.loads(value) if isinstance(value, str) else value
-    if not isinstance(parsed, list):
-        raise ValueError("expected list")
-    for period in parsed:
-        start, end = period["start"], period["end"]
-        if len(start) != 5 or start[2] != ":" or len(end) != 5 or end[2] != ":":
-            raise ValueError("time must be HH:MM")
-        sh, sm = map(int, start.split(":")); eh, em = map(int, end.split(":"))
-        if not (0 <= sh <= 23 and 0 <= eh <= 23 and 0 <= sm <= 59 and 0 <= em <= 59):
-            raise ValueError("invalid time")
-        if start >= end:
-            raise ValueError("end must be after start")
-        temp = float(period["temperature"])
-        if not 5 <= temp <= 30:
-            raise ValueError("invalid temperature")
-    return parsed
-
 def _schedule_from_input(user_input):
-    return {day: _parse_periods(user_input[f"day_{day}"]) for day in DAY_NAMES}
+    return validate_schedule({
+        day: json.loads(user_input[f"day_{day}"]) for day in DAY_NAMES
+    })
 
 def _schedule_text(schedule, day):
     return json.dumps(schedule.get(day, []), ensure_ascii=False, separators=(",", ":"))
@@ -47,13 +32,7 @@ class RoomHeatingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input:
             try:
-                schedule = json.loads(user_input[CONF_SCHEDULE])
-                if not isinstance(schedule, dict):
-                    raise ValueError
-                for day, periods in schedule.items():
-                    if day not in DAY_NAMES:
-                        raise ValueError
-                    _parse_periods(periods)
+                schedule = validate_schedule(user_input[CONF_SCHEDULE])
             except (ValueError, TypeError, KeyError, json.JSONDecodeError):
                 errors["base"] = "invalid_schedule"
             else:
@@ -64,7 +43,10 @@ class RoomHeatingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         user_input["room_name"].strip().lower() + "_" + user_input[CONF_CLIMATE]
                     )
                     self._abort_if_unique_id_configured()
-                    return self.async_create_entry(title=user_input["room_name"], data=user_input)
+                    return self.async_create_entry(
+                        title=user_input["room_name"],
+                        data={**user_input, CONF_SCHEDULE: schedule},
+                    )
 
         schema = vol.Schema({
             vol.Required("room_name"): str,
