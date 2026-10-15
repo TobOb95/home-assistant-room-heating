@@ -24,6 +24,7 @@ Room Heating ergänzt Home Assistant um eine eigene Wochenplan-Integration und e
 3. Installiere **Room Heating** und starte Home Assistant neu.
 4. Füge die Integration unter **Einstellungen → Geräte & Dienste → Integration hinzufügen** hinzu.
 5. Wähle einen Raumnamen und eine vorhandene Climate-Entität.
+Für mehrere Thermostate richtest du je Thermostat einen eigenen Room-Heating-Raum ein. Füge anschließend pro Raum eine eigene Karteninstanz hinzu; eine Karteninstanz steuert jeweils einen Raum.
 
 Beim Einrichten eines Raums erstellt die Integration die zugehörigen Room-Heating-Sensoren automatisch.
 
@@ -31,7 +32,7 @@ Beim Einrichten eines Raums erstellt die Integration die zugehörigen Room-Heati
 
 Die Integration stellt die Kartendatei bereit. Damit Home Assistant sie im Dashboard-Editor laden kann, füge sie einmalig unter **Einstellungen → Dashboards → Ressourcen** als **JavaScript-Modul** hinzu:
 
-`/api/room_heating/room-heating-card.js?v=1.0.0`
+`/api/room_heating/room-heating-card.js?v=1.0.1`
 
 Anschließend brauchst du die Entity-ID nicht in YAML einzutragen:
 
