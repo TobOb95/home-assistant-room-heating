@@ -59,11 +59,11 @@ Die Karte zeigt Ist- und Solltemperatur sowie Heizstatus. Über **− / +** kann
 
 Die bisherige Integration und die neue Automation dürfen nicht gleichzeitig Solltemperaturen für denselben Raum setzen.
 
-1. Lege Schedule-Helfer, Freigabe-Schalter und Automation an. Lass den Freigabe-Schalter zunächst ausgeschaltet.
-2. Deinstalliere **Room Heating Scheduler** in HACS und entferne die Integration unter **Einstellungen → Geräte & Dienste**. Starte Home Assistant neu.
-3. Prüfe, dass die alte Integration keine Solltemperaturen mehr setzt.
-4. Aktiviere die neue Automation und füge die Karte hinzu.
-5. Teste die Freigabe zunächst an einem Raum und prüfe im Aktivitätsprotokoll die Temperaturänderungen.
+1. Lege Schedule-Helfer und Freigabe-Schalter an. Lass den Freigabe-Schalter zunächst ausgeschaltet.
+2. Importiere die Blueprint-Vorlage und erstelle die Automation, lasse sie aber zunächst **deaktiviert**.
+3. Deinstalliere **Room Heating Scheduler** in HACS und entferne die Integration unter **Einstellungen → Geräte & Dienste**. Starte Home Assistant neu.
+4. Entferne in HACS den alten Repository-Eintrag und füge dasselbe Repository erneut mit der Kategorie **Dashboard** hinzu. Installiere die Karte.
+5. Aktiviere die neue Automation, schalte die Freigabe für einen Raum ein und prüfe im Aktivitätsprotokoll, ob der passende Sollwert gesetzt wird.
 
 Die alte Integration speichert ihre Zeitpläne in den Integrationsoptionen. Sichere oder übertrage diese Zeiten vor der Deinstallation in den neuen Schedule-Helfer.
 
