@@ -377,114 +377,100 @@ class RoomHeatingSchedulerCard extends HTMLElement {
       ${html}
     `;
 
-    this._bind();
+     this._bind();
   }
 
-  _bind() {
+   _bind() {
+    const root = this.shadowRoot;
 
-    this.shadowRoot
-      .querySelectorAll(".add")
-      .forEach((b) => {
-
-        b.onclick = () => {
-
-          const d = b.dataset.day;
-
-          (
-            this._schedule[d] ||= []
-          ).push({
-            start: "17:00",
-            end: "22:00",
-            temperature: 21,
-          });
-
-          this._dirty = true;
-
-          this.render();
-        };
-      });
-
-    this.shadowRoot
-      .querySelectorAll(".del")
-      .forEach((b) => {
-
-        b.onclick = () => {
-
-          const d = b.dataset.day;
-          const i = Number(b.dataset.i);
-
-          this._schedule[d].splice(i, 1);
-
-          this._dirty = true;
-
-          this.render();
-        };
-      });
-
-    this.shadowRoot
-      .querySelectorAll("input[data-day]")
-      .forEach((inp) => {
-
-        inp.onchange = () => {
-
-          const d = inp.dataset.day;
-          const i = Number(inp.dataset.i);
-
-          const p =
-            this._schedule[d][i];
-
-          if (
-            inp.classList.contains("start")
-          ) {
-            p.start = inp.value;
-          } else if (
-            inp.classList.contains("end")
-          ) {
-            p.end = inp.value;
-          } else {
-            p.temperature = Number(
-              inp.value
-            );
-          }
-
-          this._dirty = true;
-        };
-      });
-
-    const save =
-      this.shadowRoot.getElementById("save");
-
-    if (save) {
-      save.onclick = () => this._save();
+    if (!root) {
+      return;
     }
 
-    const vacationButton =
-      this.shadowRoot.getElementById("vacbtn");
+    root.querySelectorAll(".add").forEach((button) => {
+      button.onclick = () => {
+        const day = button.dataset.day;
+
+        (this._schedule[day] ||= []).push({
+          start: "17:00",
+          end: "22:00",
+          temperature: 21,
+        });
+
+        this._dirty = true;
+        this.render();
+      };
+    });
+
+    root.querySelectorAll(".del").forEach((button) => {
+      button.onclick = () => {
+        const day = button.dataset.day;
+        const index = Number(button.dataset.i);
+
+        if (!this._schedule[day]) {
+          return;
+        }
+
+        this._schedule[day].splice(index, 1);
+
+        this._dirty = true;
+        this.render();
+      };
+    });
+
+    root.querySelectorAll("input[data-day]").forEach((input) => {
+      input.onchange = () => {
+        const day = input.dataset.day;
+        const index = Number(input.dataset.i);
+
+        const period = this._schedule[day]?.[index];
+
+        if (!period) {
+          return;
+        }
+
+        if (input.classList.contains("start")) {
+          period.start = input.value;
+        } else if (input.classList.contains("end")) {
+          period.end = input.value;
+        } else {
+          period.temperature = Number(input.value);
+        }
+
+        this._dirty = true;
+      };
+    });
+
+    const saveButton = root.getElementById("save");
+
+    if (saveButton) {
+      saveButton.onclick = () => this._save();
+    }
+
+    const vacationButton = root.getElementById("vacbtn");
 
     if (vacationButton) {
-
       vacationButton.onclick = async () => {
+        const state = this._getEntity();
 
-        const s = this._getEntity();
+        if (!state) {
+          return;
+        }
 
         await this._hass.callService(
           "room_heating",
           "set_vacation",
           {
-            entry_id:
-              s.attributes.entry_id,
-            enabled:
-              !s.attributes.vacation,
+            entry_id: state.attributes.entry_id,
+            enabled: !state.attributes.vacation,
           }
         );
 
         this._dirty = false;
-
         this.render();
       };
     }
   }
-
   async _save() {
 
     const s = this._getEntity();
