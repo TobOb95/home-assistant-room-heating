@@ -1,6 +1,6 @@
 {
-  "name": "Room Heating Scheduler",
-  "render_readme": true,
-  "homeassistant": "2024.1.0",
-  "zip_release": false
+  "name": "Better Thermostat Heizplan-Karte",
+  "filename": "home-assistant-room-heating.js",
+  "content_in_root": true,
+  "render_readme": true
 }
