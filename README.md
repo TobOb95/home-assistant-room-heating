@@ -79,8 +79,4 @@ Die alte Integration und Scheduler Component dürfen nicht gleichzeitig Sollwert
 
 ## Lizenzen und Herkunft
 
-Der Code dieser Raumkarte und die Assets dieses Repositorys werden unter MIT-Lizenz bereitgestellt (siehe [LICENSE](LICENSE)). Scheduler Card und Scheduler Component werden als separate Drittanbieterprojekte installiert. Sie sind hier nicht eingebettet oder übernommen; ihre Urheber, Quelltexte und Lizenzbedingungen stehen in den jeweiligen verlinkten Original-Repositories. Für Better Thermostat gelten ebenfalls dessen eigene Lizenz- und Nutzungsbedingungen.
-
-## Lizenz
-
-MIT
+Scheduler Card und Scheduler Component werden als separate Drittanbieterprojekte installiert. Ihr Quellcode, ihre Oberfläche und ihre Assets werden hier nicht eingebettet oder übernommen. Die jeweiligen Lizenzbedingungen gelten im Original-Repository. Better Thermostat bleibt ebenfalls ein separates Projekt mit eigenen Lizenzbedingungen. In diesem Repository liegt derzeit keine LICENSE-Datei; es wird daher hier keine Lizenz für fremde Projekte beansprucht. Vor einer öffentlichen Weiterverwendung dieses Karten-Codes sollte der Repository-Eigentümer die gewünschte Lizenz festlegen.
