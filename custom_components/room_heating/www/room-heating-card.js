@@ -118,6 +118,7 @@ class RoomHeatingSchedulerCard extends HTMLElement {
     this._schedule = {};
     this._dirty = false;
     this._hass = null;
+    this._groupOpenState = [false, false];
   }
 
   static getConfigElement() {
@@ -172,6 +173,12 @@ class RoomHeatingSchedulerCard extends HTMLElement {
   }
 
   render() {
+    const openGroups = [...this.shadowRoot.querySelectorAll("details.day-group")]
+      .map((group) => group.open);
+    if (openGroups.length) {
+      this._groupOpenState = openGroups;
+    }
+
     if (!this._hass) {
       return;
     }
@@ -360,9 +367,9 @@ class RoomHeatingSchedulerCard extends HTMLElement {
 
     days.forEach((day, idx) => {
       if (idx === 0) {
-        html += `<details class="day-group"><summary>${groupSummary([0, 1, 2, 3, 4], "Montag–Freitag")}</summary><div class="group-days">`;
+        html += `<details class="day-group" ${this._groupOpenState[0] ? "open" : ""}><summary>${groupSummary([0, 1, 2, 3, 4], "Montag–Freitag")}</summary><div class="group-days">`;
       } else if (idx === 5) {
-        html += `</div></details><details class="day-group"><summary>${groupSummary([5, 6], "Wochenende")}</summary><div class="group-days">`;
+        html += `</div></details><details class="day-group" ${this._groupOpenState[1] ? "open" : ""}><summary>${groupSummary([5, 6], "Wochenende")}</summary><div class="group-days">`;
       }
 
       html += `
