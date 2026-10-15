@@ -32,12 +32,18 @@ class RoomHeatingCoordinator(DataUpdateCoordinator):
         self.hass = hass
         self.entry = entry
         self.vacation = bool(entry.options.get(CONF_VACATION, False))
+        self.options_snapshot = dict(entry.options)
         self.last_target = None
         self.status = "unknown"
 
     @property
     def opts(self):
         return {**self.entry.data, **self.entry.options}
+
+    def update_options(self, options):
+        """Persist service changes and mark them as already applied live."""
+        self.options_snapshot = dict(options)
+        self.hass.config_entries.async_update_entry(self.entry, options=options)
 
     def schedule(self):
         schedule = self.opts.get(CONF_SCHEDULE, DEFAULT_SCHEDULE)
@@ -130,10 +136,7 @@ class RoomHeatingCoordinator(DataUpdateCoordinator):
             CONF_VACATION: enabled,
         }
 
-        self.hass.config_entries.async_update_entry(
-            self.entry,
-            options=options,
-        )
+        self.update_options(options)
 
         self.vacation = enabled
         await self.async_update()
