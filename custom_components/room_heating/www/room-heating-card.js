@@ -242,6 +242,16 @@ class RoomHeatingSchedulerCard extends HTMLElement {
       unknown: "Zeitplanstatus unbekannt",
     };
     const profileStatus = profileLabels[attributes.schedule_status] || "Zeitplanstatus unbekannt";
+    const scheduleTemperature = attributes.vacation
+      ? attributes.vacation_temperature
+      : attributes.schedule_status === "comfort"
+        ? attributes.comfort_temperature
+        : attributes.schedule_status === "eco"
+          ? attributes.eco_temperature
+          : climateAttributes.temperature;
+    const scheduleTemperatureLabel = scheduleTemperature == null
+      ? ""
+      : ` · ${Number(scheduleTemperature).toLocaleString("de-DE", { maximumFractionDigits: 1 })} °C`;
 
     const days = [
       "Montag",
@@ -265,15 +275,15 @@ class RoomHeatingSchedulerCard extends HTMLElement {
                 <span class="heating-status ${heating ? "heating" : ""}">
                   <span class="status-dot"></span>${this._escape(heatingStatus)}
                 </span>
-                <span class="schedule-status">Zeitplan: ${this._escape(profileStatus)}</span>
+                <span class="schedule-status">${this._escape(profileStatus)}${this._escape(scheduleTemperatureLabel)}</span>
               </div>
             </div>
           </div>
           <div class="hero-temp">
-            <span>Raumtemperatur</span><strong>${currentTemperature == null ? "—" : Number(currentTemperature).toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " °C"}</strong>
-            <span class="target">Soll ${climateAttributes.temperature == null ? "—" : Number(climateAttributes.temperature).toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " °C"}</span>
+            <span>Ist-Temperatur</span><strong>${currentTemperature == null ? "—" : Number(currentTemperature).toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " °C"}</strong>
+            <span class="target">Thermostat-Sollwert ${climateAttributes.temperature == null ? "—" : Number(climateAttributes.temperature).toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " °C"}</span>
           </div>
-          <button id="save" class="save">Speichern</button>
+          <button id="save" class="save" ${this._dirty ? "" : "disabled"}>${this._dirty ? "Änderungen speichern" : "Gespeichert"}</button>
         </div>
 
         <div class="temps">
@@ -334,7 +344,27 @@ class RoomHeatingSchedulerCard extends HTMLElement {
         <div class="days">
     `;
 
+    const groupSummary = (indices, label) => {
+      const first = this._schedule[String(indices[0])] || [];
+      const allMatch = indices.every((index) =>
+        JSON.stringify(this._schedule[String(index)] || []) === JSON.stringify(first)
+      );
+      const enabled = first.filter((period) => period.enabled !== false);
+      const preview = allMatch && enabled.length
+        ? enabled.map((period) => `${period.start}–${period.end} · ${Number(period.temperature).toLocaleString("de-DE")} °C`).join("  /  ")
+        : allMatch
+          ? "Keine Komfortphase · Eco aktiv"
+          : "Tagespläne individuell";
+      return `${label} <span class="group-preview">${this._escape(preview)}</span>`;
+    };
+
     days.forEach((day, idx) => {
+      if (idx === 0) {
+        html += `<details class="day-group"><summary>${groupSummary([0, 1, 2, 3, 4], "Montag–Freitag")}</summary><div class="group-days">`;
+      } else if (idx === 5) {
+        html += `</div></details><details class="day-group"><summary>${groupSummary([5, 6], "Wochenende")}</summary><div class="group-days">`;
+      }
+
       html += `
         <section>
 
@@ -419,7 +449,7 @@ class RoomHeatingSchedulerCard extends HTMLElement {
     });
 
     html += `
-        </div>
+        </div></details>
 
       </ha-card>
     `;
@@ -461,7 +491,14 @@ class RoomHeatingSchedulerCard extends HTMLElement {
         .heating-status { display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; }
         .status-dot { width:8px; height:8px; border-radius:50%; background:var(--disabled-text-color); }
         .heating-status.heating .status-dot { background:var(--success-color, #43a047); box-shadow:0 0 0 3px color-mix(in srgb, var(--success-color, #43a047) 20%, transparent); }
-        .schedule-status { color:var(--secondary-text-color); font-size:11px; }
+        .schedule-status { color:var(--primary-color); font-size:12px; font-weight:600; padding:4px 8px; border-radius:999px; background:color-mix(in srgb, var(--primary-color) 12%, transparent); }
+        .day-group { border-bottom:1px solid var(--divider-color); }
+        .day-group > summary { display:flex; align-items:center; gap:12px; padding:14px 10px; cursor:pointer; font-weight:600; list-style:none; }
+        .day-group > summary::-webkit-details-marker { display:none; }
+        .day-group > summary::before { content:"›"; color:var(--primary-color); font-size:20px; transition:transform .15s ease; }
+        .day-group[open] > summary::before { transform:rotate(90deg); }
+        .group-preview { color:var(--secondary-text-color); font-size:12px; font-weight:400; }
+        .group-days { padding:0 8px 8px; }
         .vacation-control { display:flex; align-items:center; gap:8px; margin-left:auto; }
         .vacation-state { color:var(--secondary-text-color); font-size:12px; white-space:nowrap; }
         .vacation-state.active { color:var(--primary-color); font-weight:600; }
@@ -471,6 +508,7 @@ class RoomHeatingSchedulerCard extends HTMLElement {
         .hero-temp strong { color:var(--primary-text-color); font-size:22px; }
         .hero-temp .target { text-transform:none; letter-spacing:0; }
         .save { align-self:flex-start; }
+        .save:disabled { opacity:.62; cursor:default; }
 
         button {
           border: 0;
@@ -573,6 +611,10 @@ class RoomHeatingSchedulerCard extends HTMLElement {
         }
 
         @media (max-width: 600px) {
+          .header { align-items:flex-start; flex-wrap:wrap; }
+          .hero-temp { align-items:flex-start; }
+          .day-group > summary { align-items:flex-start; flex-wrap:wrap; gap:5px 10px; }
+          .group-preview { width:100%; padding-left:28px; }
 
           .period .start,
           .period .end {
@@ -673,8 +715,16 @@ class RoomHeatingSchedulerCard extends HTMLElement {
           }
 
           this._dirty = true;
+          this._updateSaveButton();
         };
       });
+
+    this.shadowRoot.querySelectorAll(".temps input").forEach((input) => {
+      input.onchange = () => {
+        this._dirty = true;
+        this._updateSaveButton();
+      };
+    });
 
     /*
      * Speichern
@@ -741,6 +791,13 @@ class RoomHeatingSchedulerCard extends HTMLElement {
         }
       };
     }
+  }
+
+  _updateSaveButton() {
+    const saveButton = this.shadowRoot.getElementById("save");
+    if (!saveButton) return;
+    saveButton.disabled = !this._dirty;
+    saveButton.textContent = this._dirty ? "Änderungen speichern" : "Gespeichert";
   }
 
   async _save() {
