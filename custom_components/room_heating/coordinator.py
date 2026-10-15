@@ -5,6 +5,7 @@ from datetime import datetime
 import json
 import logging
 
+from homeassistant.util import dt as dt_util
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
@@ -16,6 +17,7 @@ from .const import (
     DEFAULT_SCHEDULE,
 )
 from .validation import validate_schedule
+from .validation import target_for_schedule
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -61,25 +63,15 @@ class RoomHeatingCoordinator(DataUpdateCoordinator):
             return DEFAULT_SCHEDULE
 
     def target_temperature(self, now=None):
-        now = now or datetime.now().astimezone()
+        now = now or dt_util.now()
         options = self.opts
-
-        if self.vacation:
-            return float(
-                options.get(CONF_VACATION_TEMP, 16)
-            ), "vacation"
-
-        for period in self.schedule().get(str(now.weekday()), []):
-            try:
-                if (
-                    period.get("enabled", True)
-                    and period["start"] <= now.strftime("%H:%M") < period["end"]
-                ):
-                    return float(period["temperature"]), "comfort"
-            except (KeyError, TypeError, ValueError):
-                continue
-
-        return float(options.get(CONF_ECO, 17)), "eco"
+        return target_for_schedule(
+            self.schedule(),
+            now,
+            options.get(CONF_ECO, 17),
+            self.vacation,
+            options.get(CONF_VACATION_TEMP, 16),
+        )
 
     async def async_update(self, now=None):
         target, status = self.target_temperature(now)
