@@ -1,0 +1,74 @@
+blueprint:
+  name: Better Thermostat mit Schedule-Helfer
+  description: >-
+    Übernimmt die Temperatur aus dem aktiven Schedule-Zeitblock in Better Thermostat.
+    Bei deaktivierter Freigabe oder außerhalb eines Zeitblocks wird die Eco-Temperatur gesetzt.
+  domain: automation
+  input:
+    climate_entity:
+      name: Better-Thermostat-Gerät
+      selector:
+        entity:
+          domain: climate
+    schedule_entity:
+      name: Schedule-Helfer
+      description: Jeder aktive Zeitblock braucht unter Zusätzliche Daten den Schlüssel temperature.
+      selector:
+        entity:
+          domain: schedule
+    enabled_entity:
+      name: Heizplan-Freigabe
+      selector:
+        entity:
+          domain: input_boolean
+    eco_temperature:
+      name: Eco-Temperatur
+      default: 17
+      selector:
+        number:
+          min: 5
+          max: 25
+          step: 0.5
+          unit_of_measurement: "°C"
+
+trigger:
+  - platform: state
+    entity_id: !input schedule_entity
+  - platform: state
+    entity_id: !input enabled_entity
+  - platform: homeassistant
+    event: start
+
+action:
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: !input enabled_entity
+            state: "on"
+          - condition: state
+            entity_id: !input schedule_entity
+            state: "on"
+        sequence:
+          - service: climate.set_temperature
+            target:
+              entity_id: !input climate_entity
+            data:
+              temperature: >-
+                {{ state_attr(schedule_entity, 'temperature') | float(eco_temperature) }}
+      - conditions:
+          - condition: template
+            value_template: >-
+              {{ is_state(enabled_entity, 'off') or is_state(schedule_entity, 'off') }}
+        sequence:
+          - service: climate.set_temperature
+            target:
+              entity_id: !input climate_entity
+            data:
+              temperature: !input eco_temperature
+
+variables:
+  schedule_entity: !input schedule_entity
+  enabled_entity: !input enabled_entity
+  eco_temperature: !input eco_temperature
+
+mode: restart
