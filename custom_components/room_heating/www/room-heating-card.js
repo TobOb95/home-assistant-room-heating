@@ -1,4 +1,107 @@
-/* Room Heating Scheduler visual weekly card - v2.3.0 */
+/* Room Heating Scheduler visual weekly card - v2.4.0 */
+
+class RoomHeatingSchedulerCardEditor extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this._config = {};
+    this._hass = null;
+  }
+
+  setConfig(config) {
+    this._config = { ...config };
+    this._render();
+  }
+
+  set hass(hass) {
+    this._hass = hass;
+    this._render();
+  }
+
+  _rooms() {
+    return Object.entries(this._hass?.states || {})
+      .filter(([, state]) =>
+        state.attributes?.entry_id &&
+        state.attributes?.room_name &&
+        state.attributes?.climate_entity
+      )
+      .map(([entityId, state]) => ({
+        entityId,
+        roomName: state.attributes.room_name,
+      }))
+      .sort((a, b) => a.roomName.localeCompare(b.roomName));
+  }
+
+  _render() {
+    if (!this._hass) return;
+
+    const rooms = this._rooms();
+    const options = rooms.map(({ entityId, roomName }) => ({
+      value: entityId,
+      label: roomName,
+    }));
+
+    if (this._config.entity && !options.some((option) => option.value === this._config.entity)) {
+      options.push({ value: this._config.entity, label: this._config.entity });
+    }
+
+    const selectedEntity = this._config.entity || options[0]?.value || "";
+    this.shadowRoot.innerHTML = "<ha-form></ha-form>";
+
+    if (!options.length) {
+      this.shadowRoot.innerHTML = `
+        <p>Es wurde noch kein Room-Heating-Raum gefunden. Richte zuerst mindestens einen Raum in der Integration ein.</p>
+      `;
+      return;
+    }
+
+    const form = this.shadowRoot.querySelector("ha-form");
+    form.hass = this._hass;
+    form.schema = [{
+      name: "entity",
+      required: true,
+      selector: {
+        select: {
+          mode: "dropdown",
+          options,
+        },
+      },
+    }];
+    form.data = { entity: selectedEntity };
+    form.computeLabel = (schema) => schema.name === "entity" ? "Heizungsraum" : undefined;
+    form.computeHelper = (schema) => schema.name === "entity"
+      ? "Wähle den Raum, dessen Wochenplan diese Karte anzeigen und bearbeiten soll."
+      : undefined;
+
+    form.addEventListener("value-changed", (event) => {
+      const config = { ...this._config, ...event.detail.value };
+      this._config = config;
+      const changed = new Event("config-changed", {
+        bubbles: true,
+        composed: true,
+      });
+      changed.detail = { config };
+      this.dispatchEvent(changed);
+    });
+
+    if (!this._config.entity && selectedEntity) {
+      this._config = { ...this._config, entity: selectedEntity };
+      const changed = new Event("config-changed", {
+        bubbles: true,
+        composed: true,
+      });
+      changed.detail = { config: this._config };
+      this.dispatchEvent(changed);
+    }
+  }
+}
+
+if (!customElements.get("room-heating-scheduler-card-editor")) {
+  customElements.define(
+    "room-heating-scheduler-card-editor",
+    RoomHeatingSchedulerCardEditor
+  );
+}
 
 class RoomHeatingSchedulerCard extends HTMLElement {
   constructor() {
@@ -10,6 +113,14 @@ class RoomHeatingSchedulerCard extends HTMLElement {
     this._schedule = {};
     this._dirty = false;
     this._hass = null;
+  }
+
+  static getConfigElement() {
+    return document.createElement("room-heating-scheduler-card-editor");
+  }
+
+  static getStubConfig() {
+    return { entity: "" };
   }
 
   setConfig(config) {
@@ -775,4 +886,21 @@ window.customCards.push({
 
   documentationURL:
     "https://github.com/TobOb95/home-assistant-room-heating",
+
+  getEntitySuggestion: (hass, entityId) => {
+    const state = hass.states[entityId];
+    if (
+      !state?.attributes?.entry_id ||
+      !state.attributes?.room_name ||
+      !state.attributes?.climate_entity
+    ) {
+      return null;
+    }
+    return {
+      config: {
+        type: "custom:room-heating-scheduler-card",
+        entity: entityId,
+      },
+    };
+  },
 });
