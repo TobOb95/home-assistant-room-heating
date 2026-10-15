@@ -6,11 +6,12 @@ class RoomHeatingSchedulerCardEditor extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this._config = {};
     this._hass = null;
+    this._renderedOptions = null;
   }
 
   setConfig(config) {
     this._config = { ...config };
-    this._render();
+    this._render(true);
   }
 
   set hass(hass) {
@@ -32,7 +33,7 @@ class RoomHeatingSchedulerCardEditor extends HTMLElement {
       .sort((a, b) => a.roomName.localeCompare(b.roomName));
   }
 
-  _render() {
+  _render(force = false) {
     if (!this._hass) return;
 
     const rooms = this._rooms();
@@ -44,6 +45,10 @@ class RoomHeatingSchedulerCardEditor extends HTMLElement {
     if (this._config.entity && !options.some((option) => option.value === this._config.entity)) {
       options.push({ value: this._config.entity, label: this._config.entity });
     }
+
+    const optionsKey = JSON.stringify(options);
+    if (!force && optionsKey === this._renderedOptions) return;
+    this._renderedOptions = optionsKey;
 
     const selectedEntity = this._config.entity || options[0]?.value || "";
     this.shadowRoot.innerHTML = "<ha-form></ha-form>";
@@ -120,17 +125,11 @@ class RoomHeatingSchedulerCard extends HTMLElement {
   }
 
   static getStubConfig() {
-    return { entity: "" };
+    return {};
   }
 
   setConfig(config) {
-    if (!config || !config.entity) {
-      throw new Error(
-        "Bitte eine Room-Heating-Sensor-Entität angeben."
-      );
-    }
-
-    this._config = config;
+    this._config = config || {};
 
     this.render();
   }
@@ -172,7 +171,16 @@ class RoomHeatingSchedulerCard extends HTMLElement {
   }
 
   render() {
-    if (!this._hass || !this._config.entity) {
+    if (!this._hass) {
+      return;
+    }
+
+    if (!this._config.entity) {
+      this.shadowRoot.innerHTML = `
+        <ha-card>
+          <div class="pad">Bitte Karte bearbeiten und einen Heizungsraum auswählen.</div>
+        </ha-card>
+      `;
       return;
     }
 
