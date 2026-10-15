@@ -929,7 +929,19 @@ window.customCards.push({
       !state.attributes?.room_name ||
       !state.attributes?.climate_entity
     ) {
-      return null;
+      if (!entityId.startsWith("climate.")) return null;
+      const room = Object.entries(hass.states).find(([, candidate]) =>
+        candidate.attributes?.entry_id &&
+        candidate.attributes?.room_name &&
+        candidate.attributes?.climate_entity === entityId
+      );
+      if (!room) return null;
+      return {
+        config: {
+          type: "custom:room-heating-scheduler-card",
+          entity: room[0],
+        },
+      };
     }
     return {
       config: {
