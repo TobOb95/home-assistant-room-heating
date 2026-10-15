@@ -65,17 +65,35 @@ class RoomHeatingSchedulerCard extends HTMLElement {
       html += `</section>`;
     });
     html += `</div></ha-card>`;
-    this.shadowRoot.innerHTML = `<style>
-      :host{display:block}.pad{padding:16px}.header{display:flex;justify-content:space-between;align-items:center;padding:16px;font-size:18px}.sub{font-size:12px;opacity:.65;margin-top:4px}
-      button{border:0;border-radius:8px;padding:8px 11px;background:var(--primary-color);color:var(--text-primary-color);cursor:pointer}
-      .temps{display:flex;flex-wrap:wrap;gap:10px;padding:0 16px 14px;border-bottom:1px solid var(--divider-color)}label{display:flex;align-items:center;gap:4px;font-size:13px}
-      input{box-sizing:border-box;border:1px solid var(--divider-color);border-radius:6px;background:var(--card-background-color);color:var(--primary-text-color);padding:6px}
-      .days{padding:8px 12px}.dayhead{display:flex;justify-content:space-between;align-items:center;margin:8px 0}.dayhead button{font-size:12px;padding:5px 8px}
-      section{border-bottom:1px solid var(--divider-color);padding-bottom:8px}.period{display:flex;align-items:center;gap:5px;margin:5px 0}.period .start,.period .end{width:105px}.period .temp{width:70px}.del{background:transparent;color:var(--error-color,#db4437);font-size:18px;padding:2px 7px}.empty{font-size:12px;opacity:.55;padding:4px 0 7px}
-      @media(max-width:600px){.period .start,.period .end{width:90px}.temps{flex-direction:column}}
-    </style>${this.shadowRoot.innerHTML}`;
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host{display:block}
+        .pad{padding:16px}
+        .header{display:flex;justify-content:space-between;align-items:center;padding:16px;font-size:18px}
+        .sub{font-size:12px;opacity:.65;margin-top:4px}
+        button{border:0;border-radius:8px;padding:8px 11px;background:var(--primary-color);color:var(--text-primary-color);cursor:pointer}
+        .temps{display:flex;flex-wrap:wrap;gap:10px;padding:0 16px 14px;border-bottom:1px solid var(--divider-color)}
+        label{display:flex;align-items:center;gap:4px;font-size:13px}
+        input{box-sizing:border-box;border:1px solid var(--divider-color);border-radius:6px;background:var(--card-background-color);color:var(--primary-text-color);padding:6px}
+        .days{padding:8px 12px}
+        .dayhead{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
+        .dayhead button{font-size:12px;padding:5px 8px}
+        section{border-bottom:1px solid var(--divider-color);padding-bottom:8px}
+        .period{display:flex;align-items:center;gap:5px;margin:5px 0}
+        .period .start,.period .end{width:105px}
+        .period .temp{width:70px}
+        .del{background:transparent;color:var(--error-color,#db4437);font-size:18px;padding:2px 7px}
+        .empty{font-size:12px;opacity:.55;padding:4px 0 7px}
+        @media(max-width:600px){
+          .period .start,.period .end{width:90px}
+          .temps{flex-direction:column}
+        }
+      </style>
+      ${html}
+    `;
+
     this._bind();
-  }
 
   _bind() {
     this.shadowRoot.querySelectorAll(".add").forEach(b=>b.onclick=()=>{
