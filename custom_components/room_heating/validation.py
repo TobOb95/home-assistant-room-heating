@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 
 
 def validate_schedule(value):
@@ -61,3 +62,26 @@ def _time_minutes(value):
     if not (0 <= hour <= 23 and 0 <= minute <= 59):
         raise ValueError("invalid time")
     return hour * 60 + minute
+
+
+def target_for_schedule(
+    schedule,
+    now: datetime,
+    eco_temperature: float,
+    vacation: bool = False,
+    vacation_temperature: float = 16,
+):
+    """Resolve the target for the current local date and time."""
+    if vacation:
+        return float(vacation_temperature), "vacation"
+
+    day_periods = schedule.get(str(now.weekday()), [])
+    current_time = now.strftime("%H:%M")
+    for period in day_periods:
+        if (
+            period.get("enabled", True)
+            and period["start"] <= current_time < period["end"]
+        ):
+            return float(period["temperature"]), "comfort"
+
+    return float(eco_temperature), "eco"
