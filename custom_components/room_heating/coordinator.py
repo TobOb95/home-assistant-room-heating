@@ -40,18 +40,23 @@ class RoomHeatingCoordinator(DataUpdateCoordinator):
 
     def schedule(self):
         schedule = self.opts.get(CONF_SCHEDULE, DEFAULT_SCHEDULE)
+
         if isinstance(schedule, str):
             try:
                 schedule = json.loads(schedule)
             except (ValueError, TypeError):
                 schedule = DEFAULT_SCHEDULE
+
         return schedule if isinstance(schedule, dict) else DEFAULT_SCHEDULE
 
     def target_temperature(self, now=None):
         now = now or datetime.now().astimezone()
         options = self.opts
+
         if self.vacation:
-            return float(options.get(CONF_VACATION_TEMP, 16)), "vacation"
+            return float(
+                options.get(CONF_VACATION_TEMP, 16)
+            ), "vacation"
 
         for period in self.schedule().get(str(now.weekday()), []):
             try:
@@ -68,28 +73,58 @@ class RoomHeatingCoordinator(DataUpdateCoordinator):
         self.status = status
 
         state = self.hass.states.get(climate_entity)
+
         if state is None or state.state in ("unknown", "unavailable"):
-            self.async_set_updated_data({"target": target, "status": "unavailable"})
+            self.async_set_updated_data({
+                "target": target,
+                "status": "unavailable",
+            })
             return
 
         try:
-            if self.last_target is None or abs(self.last_target - target) >= 0.1:
+            if (
+                self.last_target is None
+                or abs(self.last_target - target) >= 0.1
+            ):
                 await self.hass.services.async_call(
                     "climate",
                     "set_temperature",
-                    {"entity_id": climate_entity, "temperature": target},
+                    {
+                        "entity_id": climate_entity,
+                        "temperature": target,
+                    },
                     blocking=True,
                 )
                 self.last_target = target
-            self.async_set_updated_data({"target": target, "status": status})
+
+            self.async_set_updated_data({
+                "target": target,
+                "status": status,
+            })
+
         except Exception:
-            _LOGGER.exception("Could not set temperature on %s", climate_entity)
-            self.async_set_updated_data({"target": target, "status": "error"})
+            _LOGGER.exception(
+                "Could not set temperature on %s",
+                climate_entity,
+            )
+            self.async_set_updated_data({
+                "target": target,
+                "status": "error",
+            })
 
     async def async_set_vacation(self, enabled):
         """Set vacation mode and persist it."""
-        options = {**self.entry.options, CONF_VACATION: bool(enabled)}
-        self.hass.config_entries.async_update_entry(self.entry, options=options)
-        self.entry.options = options
-        self.vacation = bool(enabled)
+        enabled = bool(enabled)
+
+        options = {
+            **self.entry.options,
+            CONF_VACATION: enabled,
+        }
+
+        self.hass.config_entries.async_update_entry(
+            self.entry,
+            options=options,
+        )
+
+        self.vacation = enabled
         await self.async_update()
