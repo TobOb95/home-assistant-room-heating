@@ -49,10 +49,10 @@ Wiederhole die Einrichtung für jeden Raum, den du verwalten möchtest. Wähle d
 Wenn die Karte nicht in der Auswahl erscheint, prüfe **Einstellungen → Dashboards → Ressourcen**. Die JavaScript-Ressource soll einmal als **JavaScript-Modul** eingetragen sein:
 
 ```text
-/api/room_heating/room-heating-card.js?v=1.0.4
+/api/room_heating/room-heating-card.js
 ```
 
-Wenn bereits eine ältere Room-Heating-Ressource eingetragen ist, bearbeite sie und ersetze nur die Versionsnummer nach `v=` durch die installierte Version. Lege keinen doppelten Ressourceneintrag an. Lade danach das Dashboard neu (im Browser mit **Strg+F5**).
+Wenn bereits eine ältere Room-Heating-Ressource mit einem Versionszusatz wie `?v=1.0.4` eingetragen ist, bearbeite sie und entferne den gesamten Zusatz ab `?`. Lege keinen doppelten Ressourceneintrag an. Die feste Adresse bleibt auch nach künftigen Updates gleich. Lade danach das Dashboard neu.
 
 Eine YAML-Karte ist ebenfalls möglich. Ersetze die Beispiel-Entity durch den Heiz-Solltemperatursensor des gewünschten Room-Heating-Raums:
 
@@ -76,8 +76,8 @@ Du kannst Zeitpläne, Temperaturen und den Urlaubsmodus auf der Karte bearbeiten
 
 1. Öffne **HACS → Integrationen → Room Heating** und installiere das angebotene Update.
 2. Warte, bis HACS den Download abgeschlossen hat, und starte Home Assistant neu.
-3. Prüfe unter **Einstellungen → Dashboards → Ressourcen**, ob eine manuell eingetragene Room-Heating-Ressource noch die Versionsnummer der vorherigen Installation enthält. Aktualisiere sie bei Bedarf auf die Version aus HACS, zum Beispiel `v=1.0.4`.
-4. Lade das Dashboard neu. Im Browser geht das mit **Strg+F5**; in der Home-Assistant-App kannst du die Oberfläche neu laden oder die App erneut starten.
+3. Lade das Dashboard neu. Die Resource-Adresse bleibt bei der festen URL unverändert; sie muss nach einem Update nicht angepasst werden.
+4. Wird noch die alte Kartenversion angezeigt oder erscheint „Custom element doesn't exist“, lade die Oberfläche mit einem harten Reload neu. Im Browser unter Windows/Linux: **Strg+F5** oder **Strg+Umschalt+R**; unter macOS: **Cmd+Umschalt+R**. In der Home-Assistant-App: **Einstellungen → Companion App → Fehlerbehebung → Frontend-Cache zurücksetzen** (Bezeichnung und Menüpfad können je nach App-Version leicht abweichen).
 
 Du musst die Integration oder Räume für ein normales Update nicht entfernen und erneut einrichten. Die gespeicherten Zeitpläne und Einstellungen bleiben erhalten.
 
