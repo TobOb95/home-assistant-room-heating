@@ -25,7 +25,7 @@ Die Karte steuert selbst keinen Zeitplan im Hintergrund. Home Assistant führt d
 
 Falls HACS die Ressource nicht automatisch registriert, füge unter **Einstellungen → Dashboards → Ressourcen** die JavaScript-Datei als Modul hinzu. Der Pfad lautet:
 
-    /hacsfiles/home-assistant-room-heating/room-heating-better-thermostat-card.js
+    /hacsfiles/home-assistant-room-heating/home-assistant-room-heating.js
 
 ## Einrichten eines Raums
 
