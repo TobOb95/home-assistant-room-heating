@@ -1,0 +1,31 @@
+# Room Heating – individuelle Nutzungslizenz
+
+Copyright © 2026 Tobias Schirra. Alle Rechte vorbehalten.
+
+Diese Lizenz gilt für den Quellcode, die Dashboard-Karte, Dokumentation und sonstige Inhalte dieses Repositorys, soweit sie Tobias Schirra gehören oder von ihm lizenziert werden.
+
+## Erlaubte Nutzung
+
+Du darfst die unveränderte Originalversion kostenlos herunterladen, in deiner eigenen Home-Assistant-Installation installieren und dort privat und nicht kommerziell ausführen. Die hierfür technisch notwendigen Kopien auf deinem Home-Assistant-System und in deinen privaten Sicherungen sind erlaubt.
+
+Diese Erlaubnis ist nicht exklusiv und gilt weltweit. Sie überträgt kein Eigentum am Projekt.
+
+## Nicht erlaubte Nutzung
+
+Ohne vorherige schriftliche Erlaubnis des Rechteinhabers darfst du nicht:
+
+- den Quellcode, die Karte oder andere Bestandteile verändern, übersetzen, anpassen oder davon abgeleitete Versionen erstellen;
+- veränderte Versionen installieren, ausführen oder anderweitig verwenden;
+- Kopien außerhalb der von GitHub bereitgestellten Repository- und Fork-Funktionen weitergeben, veröffentlichen, spiegeln, verkaufen, unterlizenzieren oder anderweitig öffentlich zugänglich machen;
+- Bestandteile des Projekts in andere Software oder Produkte übernehmen oder als eigenes Werk weiterverwenden;
+- diese Nutzungserlaubnis übertragen oder unterlizenzieren.
+
+## Öffentliche GitHub-Repositories und Forks
+
+Das Repository bleibt öffentlich. GitHub-Nutzer dürfen es im Rahmen der GitHub-Nutzungsbedingungen ansehen und die dort angebotene Fork-Funktion verwenden. Diese Lizenz erlaubt dadurch keine Nutzung veränderter Versionen und keine Weiterverteilung außerhalb von GitHub. Jede Nutzung einer Kopie unterliegt weiterhin den Bedingungen dieser Lizenz.
+
+## Beendigung und Gewährleistung
+
+Bei einem Verstoß gegen diese Bedingungen endet die Nutzungserlaubnis. Soweit gesetzlich zulässig wird die Software ohne Gewährleistung bereitgestellt. Zwingende gesetzliche Rechte bleiben unberührt.
+
+Für eine weitergehende Nutzung ist vorab eine schriftliche Erlaubnis des Rechteinhabers erforderlich.
