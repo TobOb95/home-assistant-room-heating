@@ -85,4 +85,4 @@ Du musst die Integration oder Räume für ein normales Update nicht entfernen un
 
 HACS zeigt die neueste veröffentlichte GitHub-Version anhand des Release-Tags an, zum Beispiel `v1.0.3`. Die Versionsnummer in der Integrationsdatei allein veröffentlicht kein HACS-Update.
 
-Das GitHub-Repository ist öffentlich einsehbar und kann als benutzerdefiniertes HACS-Repository eingebunden werden. Aktuell enthält es keine Lizenzdatei. Die öffentliche Sichtbarkeit allein legt keine zusätzlichen Nutzungs- oder Weitergaberechte fest.
+Die [individuelle Nutzungslizenz](LICENSE) erlaubt die private, nicht kommerzielle Nutzung der unveränderten Originalversion. Änderungen, die Nutzung veränderter Versionen und Weitergabe außerhalb der GitHub-Repository- und Fork-Funktionen sind nicht erlaubt. GitHub-Forks bleiben im Rahmen der GitHub-Nutzungsbedingungen möglich.
