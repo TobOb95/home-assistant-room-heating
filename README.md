@@ -77,7 +77,7 @@ Du kannst Zeitpläne, Temperaturen und den Urlaubsmodus auf der Karte bearbeiten
 1. Öffne **HACS → Integrationen → Room Heating** und installiere das angebotene Update.
 2. Warte, bis HACS den Download abgeschlossen hat, und starte Home Assistant neu.
 3. Lade das Dashboard neu. Die Resource-Adresse bleibt bei der festen URL unverändert; sie muss nach einem Update nicht angepasst werden.
-4. Wird noch die alte Kartenversion angezeigt oder erscheint „Custom element doesn't exist“, lade die Oberfläche mit einem harten Reload neu. Im Browser unter Windows/Linux: **Strg+F5** oder **Strg+Umschalt+R**; unter macOS: **Cmd+Umschalt+R**. In der Home-Assistant-App: **Einstellungen → Companion App → Fehlerbehebung → Frontend-Cache zurücksetzen** (Bezeichnung und Menüpfad können je nach App-Version leicht abweichen).
+4. Wird noch die alte Kartenversion angezeigt oder erscheint „Custom element doesn't exist“, schließe zuerst alle Home-Assistant-Tabs und App-Fenster und öffne Home Assistant erneut. Falls nötig, erzwinge einen harten Reload: im Browser unter Windows/Linux **Strg+F5** oder **Strg+Umschalt+R**, unter macOS **Cmd+Umschalt+R**. In der Companion App kannst du unter **Einstellungen** den **Frontend-Cache zurücksetzen**. [Weitere Hinweise zur Cache-Aktualisierung](https://www.home-assistant.io/faq/browser/).
 
 Du musst die Integration oder Räume für ein normales Update nicht entfernen und erneut einrichten. Die gespeicherten Zeitpläne und Einstellungen bleiben erhalten.
 
