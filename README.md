@@ -3,7 +3,7 @@
 Raumweise Heizungssteuerung für Home Assistant mit Wochenplan, Komfort-/Eco-/Urlaubstemperatur und visueller Lovelace-Karte.
 
 ## Status
-Version 2.3.0 – Community-Projekt.
+Version 2.4.0 – Community-Projekt.
 
 ## Installation über HACS
 1. HACS öffnen.
@@ -18,6 +18,8 @@ Version 2.3.0 – Community-Projekt.
 Nach der Installation die Datei `room-heating-card.js` als Lovelace-Ressource vom Pfad
 `/api/room_heating/room-heating-card.js` einbinden, falls HACS sie nicht automatisch registriert.
 Alternativ kann die Karte über den Dashboard-Karten-Editor als `custom:room-heating-scheduler-card` hinzugefügt werden.
+
+Beim Hinzufügen der Karte wird ein vorhandener Heizungsraum vorausgewählt. Du kannst den Raum im visuellen Karteneditor ändern. Wählst du beim Erstellen direkt einen Heiz-Solltemperatur-Sensor aus, kann Home Assistant die Wochenplan-Karte dafür vorschlagen.
 
 Die Karte verwendet als `entity` die Entität **Heiz-Solltemperatur** des gewünschten Raums. Wähle die tatsächliche Entity-ID in Home Assistant aus; sie hängt vom Raum und der Entity-ID-Konfiguration ab.
 
