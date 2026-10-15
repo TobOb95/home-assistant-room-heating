@@ -1,7 +1,7 @@
 # Room Heating – Wochenplan für Home Assistant
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/TobOb95/home-assistant-room-heating/main/assets/room-heating-logo.png" alt="Room Heating Logo" width="180">
+  <img src="https://raw.githubusercontent.com/TobOb95/home-assistant-room-heating/main/assets/room-heating-logo.svg" alt="Room Heating Logo" width="180">
 </p>
 
 Room Heating ergänzt Home Assistant um eine eigene Heizungsintegration mit Wochenplan und Dashboard-Karte. Die Integration verwendet vorhandene Climate-Entitäten, zum Beispiel von Better Thermostat.
@@ -79,7 +79,7 @@ HACS zeigt als verfügbare Version die neueste veröffentlichte GitHub-Release-V
 
 ## Logo in Home Assistant und HACS
 
-Das PNG-Logo wird oben in dieser HACS-Repositorybeschreibung angezeigt. Die Integration enthält zusätzlich Markenbilder unter `custom_components/room_heating/brand/`, damit Home Assistant sie an den unterstützten Stellen verwenden kann.
+Das SVG-Logo wird oben in dieser HACS-Repositorybeschreibung angezeigt. Die Integration enthält zusätzlich Markenbilder unter `custom_components/room_heating/brand/`, damit Home Assistant sie an den unterstützten Stellen verwenden kann.
 
 Falls das Symbol auf der HACS-Repository-Kachel trotz aktualisierter Integration noch als Platzhalter erscheint, kann HACS das lokale Markenbild derzeit möglicherweise nicht in dieser Kachel anzeigen. Das Logo bleibt in der Repositorybeschreibung und – ab Home Assistant 2026.3 – an den von Home Assistant unterstützten Integrationsstellen verfügbar. Nach einem Update kannst du HACS neu laden; du musst die Integration dafür nicht neu konfigurieren.
 
