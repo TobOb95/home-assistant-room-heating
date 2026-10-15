@@ -1,6 +1,8 @@
 # Changelog
 
-## 2.1.0
-- Visuelle Wochenplan-Karte mit bearbeitbaren Zeitblöcken.
-- Pro Raum ein Wochenplan sowie Komfort-, Absenk- und Urlaubstemperatur.
-- Erste HACS-Repository-Struktur.
+## 2.2.0
+- Visual weekly scheduler card added.
+- Vacation mode is persisted in config entry options.
+- Manifest documentation and issue tracker fixed.
+- Room heating sensor exposes schedule and temperature settings to the card.
+- Improved HACS-ready repository structure.

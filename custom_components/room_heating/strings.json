@@ -2,44 +2,43 @@
   "config": {
     "step": {
       "user": {
-        "title": "Raumheizung hinzufügen",
-        "description": "Ein Raum pro Eintrag. Zeitplan als JSON, Wochentage 0=Montag bis 6=Sonntag.",
+        "title": "Room Heating einrichten",
+        "description": "Wähle einen Raum und den zugehörigen Climate-Thermostat.",
         "data": {
           "room_name": "Raumname",
           "climate_entity": "Thermostat",
-          "comfort_temperature": "Komforttemperatur (°C)",
-          "eco_temperature": "Absenktemperatur (°C)",
-          "schedule": "Wochenplan (JSON)"
+          "comfort_temperature": "Komforttemperatur",
+          "eco_temperature": "Eco-Temperatur",
+          "schedule": "Wochenplan als JSON"
         }
       }
     },
     "error": {
-      "invalid_climate": "Bitte eine climate-Entität wählen.",
-      "invalid_schedule": "Ungültiger Wochenplan: gültiges JSON eingeben."
+      "invalid_schedule": "Der Wochenplan ist ungültig.",
+      "invalid_climate": "Bitte eine Climate-Entität auswählen."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "Heizplan konfigurieren",
-        "description": "Bearbeite pro Wochentag die Zeitfenster als Liste im JSON-Format. Beispiel: [{\"start\":\"06:30\",\"end\":\"08:30\",\"temperature\":21},{\"start\":\"17:00\",\"end\":\"22:00\",\"temperature\":20}]. Leere Liste [] bedeutet ganztägig Absenktemperatur.",
+        "title": "Room Heating Einstellungen",
+        "description": "Temperaturen und Wochenplan bearbeiten.",
         "data": {
-          "comfort_temperature": "Komforttemperatur (°C)",
-          "eco_temperature": "Absenktemperatur (°C)",
-          "schedule": "Wochenplan (JSON)",
-          "vacation_temperature": "Urlaubstemperatur (°C)",
-          "day_0": "Montag – Zeitfenster (JSON-Liste)",
-          "day_1": "Dienstag – Zeitfenster (JSON-Liste)",
-          "day_2": "Mittwoch – Zeitfenster (JSON-Liste)",
-          "day_3": "Donnerstag – Zeitfenster (JSON-Liste)",
-          "day_4": "Freitag – Zeitfenster (JSON-Liste)",
-          "day_5": "Samstag – Zeitfenster (JSON-Liste)",
-          "day_6": "Sonntag – Zeitfenster (JSON-Liste)"
+          "comfort_temperature": "Komforttemperatur",
+          "eco_temperature": "Eco-Temperatur",
+          "vacation_temperature": "Urlaubstemperatur",
+          "day_0": "Montag",
+          "day_1": "Dienstag",
+          "day_2": "Mittwoch",
+          "day_3": "Donnerstag",
+          "day_4": "Freitag",
+          "day_5": "Samstag",
+          "day_6": "Sonntag"
         }
       }
     },
     "error": {
-      "invalid_schedule": "Ungültige Zeitfenster. Prüfe HH:MM, Temperaturen von 5–30 °C und dass Ende nach Start liegt."
+      "invalid_schedule": "Der Wochenplan ist ungültig."
     }
   }
 }

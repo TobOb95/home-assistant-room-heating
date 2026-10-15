@@ -1,63 +1,31 @@
-# Room Heating Scheduler for Home Assistant
+# Room Heating Scheduler
 
-Raumweise Heizungssteuerung mit Wochenplan und visueller Lovelace-Karte.
-
-## Funktionen
-- Ein `climate`-Thermostat pro Raum
-- Wochenplan Montag bis Sonntag mit mehreren Heizphasen
-- Komfort-, Absenk- und Urlaubstemperatur
-- Dashboard-Karte mit Zeitblock-Editor, Verschieben und Resize
-- Urlaubsschalter und Sensoren für Solltemperatur / aktives Profil
+Raumweise Heizungssteuerung für Home Assistant mit Wochenplan, Komfort-/Eco-/Urlaubstemperatur und visueller Lovelace-Karte.
 
 ## Status
-Dies ist ein Community-Projekt in Entwicklung. Vor einem produktiven Einsatz in einer laufenden Home-Assistant-Installation sind Laufzeit- und Kompatibilitätstests erforderlich.
+Version 2.2.0 – Community-Projekt.
 
 ## Installation über HACS
-1. Veröffentliche dieses Repository auf GitHub.
-2. In Home Assistant HACS öffnen.
-3. Über das Drei-Punkte-Menü **Benutzerdefinierte Repositories** wählen.
-4. GitHub-Repository-URL einfügen und Typ **Integration** wählen.
-5. Room Heating Scheduler installieren und Home Assistant neu starten.
-6. Unter **Einstellungen → Geräte & Dienste → Integration hinzufügen** die Integration Room Heating hinzufügen.
+1. HACS öffnen.
+2. **Benutzerdefinierte Repositories** auswählen.
+3. `TobOb95/home-assistant-room-heating` als Repository hinzufügen.
+4. Typ **Integration** wählen.
+5. **Room Heating Scheduler** installieren.
+6. Home Assistant neu starten.
+7. **Einstellungen → Geräte & Dienste → Integration hinzufügen** und nach „Room Heating Scheduler“ suchen.
 
-## Dashboard-Karte
-Die Karte ist im Integrationspaket unter `custom_components/room_heating/www/room-heating-card.js` enthalten. Die Integration muss sie über Home Assistant HTTP als statische Ressource bereitstellen und die Ressource im Lovelace-Storage-Modus registrieren. Für YAML-Modus ist eine manuelle Ressourcenregistrierung erforderlich.
+## Visuelle Karte
+Nach der Installation die Datei `room-heating-card.js` als Lovelace-Ressource vom Pfad
+`/api/room_heating/room-heating-card.js` einbinden, falls HACS sie nicht automatisch registriert.
+Alternativ kann die Karte über den Dashboard-Karten-Editor als `custom:room-heating-scheduler-card` hinzugefügt werden.
 
-## Raumkarte konfigurieren
-Beispiel für die Karte, nachdem die Ressource verfügbar ist:
+Die Karte verwendet als `entity` den Sensor **Heiz-Solltemperatur** eines Raums, z. B.:
+`room_heating.raum_heiz_solltemperatur` (die tatsächliche Entity-ID hängt vom Raum ab).
 
-```yaml
-type: custom:room-heating-card
-title: Wohnzimmer
-entry_id: DEINE_CONFIG_ENTRY_ID
-climate_entity: climate.wohnzimmer
-comfort_temperature: 21
-eco_temperature: 17
-vacation_temperature: 16
-schedule:
-  "0":
-    - start: "06:30"
-      end: "08:30"
-      temperature: 21
-    - start: "17:00"
-      end: "22:30"
-      temperature: 21
-  "1": []
-  "2": []
-  "3": []
-  "4": []
-  "5":
-    - start: "08:00"
-      end: "23:00"
-      temperature: 21
-  "6":
-    - start: "08:00"
-      end: "22:30"
-      temperature: 21
-```
-
-## Entwicklung und Sicherheit
-- Keine Verbindung zu externen Diensten erforderlich.
-- Vor Updates ein Home-Assistant-Backup erstellen.
-- Thermostat und Heizpläne zunächst mit einem einzelnen Raum testen.
-- Noch nicht als produktionsreif zertifiziert.
+## Funktionen
+- ein Climate-Thermostat pro Raum
+- Wochenplan mit mehreren Heizphasen pro Tag
+- Komfort-, Eco- und Urlaubstemperatur
+- dauerhafter Urlaubsmodus
+- Solltemperatur- und Profil-Sensor
+- visuelle Wochenplan-Karte
