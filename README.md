@@ -6,7 +6,7 @@
 
 Room Heating ergänzt Home Assistant um eine Integration mit Wochenplänen und einer Dashboard-Karte. Du kannst vorhandene Thermostate aus Home Assistant verwenden, zum Beispiel Climate-Entitäten von Better Thermostat. Room Heating erstellt keine zusätzlichen Thermostate.
 
-**Aktuelle Version: 1.0.3** · [Alle Releases ansehen](https://github.com/TobOb95/home-assistant-room-heating/releases)
+**Aktuelle Version: 1.0.4** · [Alle Releases ansehen](https://github.com/TobOb95/home-assistant-room-heating/releases)
 
 ## Was die Integration bietet
 
@@ -49,7 +49,7 @@ Wiederhole die Einrichtung für jeden Raum, den du verwalten möchtest. Wähle d
 Wenn die Karte nicht in der Auswahl erscheint, prüfe **Einstellungen → Dashboards → Ressourcen**. Die JavaScript-Ressource soll einmal als **JavaScript-Modul** eingetragen sein:
 
 ```text
-/api/room_heating/room-heating-card.js?v=1.0.3
+/api/room_heating/room-heating-card.js?v=1.0.4
 ```
 
 Wenn bereits eine ältere Room-Heating-Ressource eingetragen ist, bearbeite sie und ersetze nur die Versionsnummer nach `v=` durch die installierte Version. Lege keinen doppelten Ressourceneintrag an. Lade danach das Dashboard neu (im Browser mit **Strg+F5**).
@@ -76,13 +76,13 @@ Du kannst Zeitpläne, Temperaturen und den Urlaubsmodus auf der Karte bearbeiten
 
 1. Öffne **HACS → Integrationen → Room Heating** und installiere das angebotene Update.
 2. Warte, bis HACS den Download abgeschlossen hat, und starte Home Assistant neu.
-3. Prüfe unter **Einstellungen → Dashboards → Ressourcen**, ob eine manuell eingetragene Room-Heating-Ressource noch die Versionsnummer der vorherigen Installation enthält. Aktualisiere sie bei Bedarf auf die Version aus HACS, zum Beispiel `v=1.0.3`.
+3. Prüfe unter **Einstellungen → Dashboards → Ressourcen**, ob eine manuell eingetragene Room-Heating-Ressource noch die Versionsnummer der vorherigen Installation enthält. Aktualisiere sie bei Bedarf auf die Version aus HACS, zum Beispiel `v=1.0.4`.
 4. Lade das Dashboard neu. Im Browser geht das mit **Strg+F5**; in der Home-Assistant-App kannst du die Oberfläche neu laden oder die App erneut starten.
 
 Du musst die Integration oder Räume für ein normales Update nicht entfernen und erneut einrichten. Die gespeicherten Zeitpläne und Einstellungen bleiben erhalten.
 
 ## Version und Lizenz
 
-HACS zeigt die neueste veröffentlichte GitHub-Version anhand des Release-Tags an, zum Beispiel `v1.0.3`. Die Versionsnummer in der Integrationsdatei allein veröffentlicht kein HACS-Update.
+HACS zeigt die neueste veröffentlichte GitHub-Version anhand des Release-Tags an, zum Beispiel `v1.0.4`. Die Versionsnummer in der Integrationsdatei allein veröffentlicht kein HACS-Update.
 
 Die [individuelle Nutzungslizenz](LICENSE) erlaubt die private, nicht kommerzielle Nutzung der unveränderten Originalversion. Änderungen, die Nutzung veränderter Versionen und Weitergabe außerhalb der GitHub-Repository- und Fork-Funktionen sind nicht erlaubt. GitHub-Forks bleiben im Rahmen der GitHub-Nutzungsbedingungen möglich.
