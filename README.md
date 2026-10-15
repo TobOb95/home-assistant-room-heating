@@ -6,7 +6,7 @@
 
 Room Heating ergänzt Home Assistant um eine eigene Heizungsintegration mit Wochenplan und Dashboard-Karte. Die Integration verwendet vorhandene Climate-Entitäten, zum Beispiel von Better Thermostat.
 
-**Integrationsversion: 1.0.2**
+**Integrationsversion: 1.0.3**
 
 ## Funktionen
 
@@ -40,7 +40,7 @@ Richte für jedes Thermostat einen eigenen Raum ein. Pro Raum verwendest du eine
 Die Integration stellt die Kartendatei bereit. Prüfe zunächst unter **Einstellungen → Dashboards → Ressourcen**, ob die Room-Heating-Ressource bereits eingetragen ist. Falls nicht, füge sie als **JavaScript-Modul** hinzu:
 
 ```text
-/api/room_heating/room-heating-card.js?v=1.0.2
+/api/room_heating/room-heating-card.js?v=1.0.3
 ```
 
 Wenn dort schon eine ältere Room-Heating-URL eingetragen ist, bearbeite den vorhandenen Eintrag und aktualisiere nur den Wert hinter `v=` auf die installierte Version. Lege keinen zweiten Eintrag für dieselbe Kartendatei an.
@@ -68,14 +68,14 @@ Ersetze die Beispiel-Entity durch den automatisch angelegten Heiz-Solltemperatur
 2. Wähle **Aktualisieren**. Wenn kein Update angeboten wird, öffne das Menü **⋮** des Repositorys und wähle **Erneut herunterladen** beziehungsweise lade die neueste Version herunter.
 3. Warte, bis HACS den Download abgeschlossen hat.
 4. Starte Home Assistant neu, damit Integration und Karten-Datei aus der aktualisierten Version geladen werden.
-5. Öffne **Einstellungen → Dashboards → Ressourcen** und ändere bei Bedarf die vorhandene Karten-URL auf die neue Versionsnummer hinter `v=` (zum Beispiel `v=1.0.2`). Die Versionsnummer in der URL leert den Browsercache für die Karten-Datei.
+5. Öffne **Einstellungen → Dashboards → Ressourcen** und ändere bei Bedarf die vorhandene Karten-URL auf die neue Versionsnummer hinter `v=` (zum Beispiel `v=1.0.3`). Die Versionsnummer in der URL leert den Browsercache für die Karten-Datei.
 6. Lade das Dashboard im Browser mit **Strg+F5** neu. In der Home-Assistant-App lade die Oberfläche neu oder starte die App erneut.
 
 Du musst die Integration oder Räume nach einem normalen Update nicht entfernen und neu einrichten. Die gespeicherten Zeitpläne bleiben erhalten.
 
 ## Versionsnummer in HACS
 
-HACS zeigt als verfügbare Version die neueste veröffentlichte GitHub-Release-Version mit ihrem Tag an. Die Versionsnummer in der Integrationsdatei allein veröffentlicht noch keine HACS-Version. Dieses Projekt verwendet Tags im Format `vMAJOR.MINOR.PATCH`, zum Beispiel `v1.0.2`. Ohne GitHub-Release zeigt HACS stattdessen eine kurze Commit-Kennung an.
+HACS zeigt als verfügbare Version die neueste veröffentlichte GitHub-Release-Version mit ihrem Tag an. Die Versionsnummer in der Integrationsdatei allein veröffentlicht noch keine HACS-Version. Dieses Projekt verwendet Tags im Format `vMAJOR.MINOR.PATCH`, zum Beispiel `v1.0.3`. Ohne GitHub-Release zeigt HACS stattdessen eine kurze Commit-Kennung an.
 
 ## Logo in Home Assistant und HACS
 
