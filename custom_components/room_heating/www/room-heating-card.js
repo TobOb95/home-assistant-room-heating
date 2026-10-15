@@ -216,6 +216,32 @@ class RoomHeatingSchedulerCard extends HTMLElement {
     const action = climateAttributes.hvac_action;
     const heating = action === "heating";
     const currentTemperature = climateAttributes.current_temperature;
+    const actionLabels = {
+      heating: "Heizt gerade",
+      idle: "Heizt aktuell nicht",
+      cooling: "Kühlt gerade",
+      drying: "Entfeuchtet",
+      fan: "Lüftet",
+      preheating: "Heizt vor",
+      defrosting: "Enteist",
+      off: "Thermostat ausgeschaltet",
+    };
+    const heatingStatus = actionLabels[action] || (
+      !climate
+        ? "Thermostat nicht verfügbar"
+        : climate.state === "off"
+          ? "Thermostat ausgeschaltet"
+          : "Betriebsstatus nicht gemeldet"
+    );
+    const profileLabels = {
+      comfort: "Komfortphase",
+      eco: "Eco-Zeit",
+      vacation: "Urlaubsmodus aktiv",
+      unavailable: "Thermostat nicht verfügbar",
+      error: "Fehler bei der Sollwertübergabe",
+      unknown: "Zeitplanstatus unbekannt",
+    };
+    const profileStatus = profileLabels[attributes.schedule_status] || "Zeitplanstatus unbekannt";
 
     const days = [
       "Montag",
@@ -233,7 +259,15 @@ class RoomHeatingSchedulerCard extends HTMLElement {
         <div class="header">
           <div>
               <b>${this._escape(attributes.room_name || "Room Heating")}</b>
-            <div class="sub">Better Thermostat · ${heating ? "Heizt gerade" : this._escape(state.state)}</div>
+            <div class="status-block">
+              <span class="status-label">Aktueller Heizbetrieb</span>
+              <div class="status-row">
+                <span class="heating-status ${heating ? "heating" : ""}">
+                  <span class="status-dot"></span>${this._escape(heatingStatus)}
+                </span>
+                <span class="schedule-status">Zeitplan: ${this._escape(profileStatus)}</span>
+              </div>
+            </div>
           </div>
           <div class="hero-temp">
             <span>Raumtemperatur</span><strong>${currentTemperature == null ? "—" : Number(currentTemperature).toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " °C"}</strong>
@@ -283,13 +317,17 @@ class RoomHeatingSchedulerCard extends HTMLElement {
             °C
           </label>
 
-          <button id="vacbtn">
-            ${
-              attributes.vacation
-                ? "Urlaub AUS"
-                : "Urlaub AN"
-            }
-          </button>
+          <div class="vacation-control">
+            <span class="vacation-state ${attributes.vacation ? "active" : ""}">
+              Urlaubsmodus ${attributes.vacation ? "aktiv" : "inaktiv"}
+            </span>
+            <button
+              id="vacbtn"
+              aria-label="${attributes.vacation ? "Urlaubsmodus deaktivieren" : "Urlaubsmodus aktivieren"}"
+            >
+              ${attributes.vacation ? "Deaktivieren" : "Aktivieren"}
+            </button>
+          </div>
 
         </div>
 
@@ -417,11 +455,16 @@ class RoomHeatingSchedulerCard extends HTMLElement {
           background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 11%, var(--ha-card-background, var(--card-background-color))), var(--ha-card-background, var(--card-background-color)) 68%);
         }
 
-        .sub {
-          font-size: 12px;
-          opacity: 0.65;
-          margin-top: 4px;
-        }
+        .status-block { display:flex; flex-direction:column; gap:5px; margin-top:7px; }
+        .status-label { color:var(--secondary-text-color); font-size:11px; }
+        .status-row { display:flex; flex-wrap:wrap; align-items:center; gap:7px; }
+        .heating-status { display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; }
+        .status-dot { width:8px; height:8px; border-radius:50%; background:var(--disabled-text-color); }
+        .heating-status.heating .status-dot { background:var(--success-color, #43a047); box-shadow:0 0 0 3px color-mix(in srgb, var(--success-color, #43a047) 20%, transparent); }
+        .schedule-status { color:var(--secondary-text-color); font-size:11px; }
+        .vacation-control { display:flex; align-items:center; gap:8px; margin-left:auto; }
+        .vacation-state { color:var(--secondary-text-color); font-size:12px; white-space:nowrap; }
+        .vacation-state.active { color:var(--primary-color); font-weight:600; }
 
         .hero-temp { display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
         .hero-temp span { color:var(--secondary-text-color); font-size:11px; text-transform:uppercase; letter-spacing:.05em; }
