@@ -3,7 +3,7 @@
 Raumweise Heizungssteuerung für Home Assistant mit Wochenplan, Komfort-/Eco-/Urlaubstemperatur und visueller Lovelace-Karte.
 
 ## Status
-Version 2.2.0 – Community-Projekt.
+Version 2.3.0 – Community-Projekt.
 
 ## Installation über HACS
 1. HACS öffnen.
