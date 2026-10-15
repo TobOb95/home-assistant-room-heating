@@ -66,6 +66,7 @@ class BetterThermostatScheduleCard extends HTMLElement {
       .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
   }
   _temperature(value) {
+    if (value === null || value === undefined || value === "") return "—";
     const number = Number(value);
     return Number.isFinite(number) ? number.toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " °C" : "—";
   }
@@ -105,7 +106,7 @@ class BetterThermostatScheduleCard extends HTMLElement {
     const title = this._escape(cfg.name || attrs.friendly_name || cfg.climate_entity);
     const current = this._temperature(attrs.current_temperature);
     const target = this._temperature(attrs.temperature);
-    const humidity = Number(attrs.humidity);
+    const humidity = attrs.humidity === null || attrs.humidity === undefined || attrs.humidity === "" ? NaN : Number(attrs.humidity);
     const extras = [];
     if (attrs.window_open === true) extras.push("<span class='tag warning'>Fenster offen</span>");
     if (Number.isFinite(humidity)) extras.push("<span class='tag'>Luftfeuchte " + Math.round(humidity) + " %</span>");
