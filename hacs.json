@@ -1,6 +1,6 @@
 {
-  "name": "Better Thermostat Heizplan-Karte",
-  "filename": "home-assistant-room-heating.js",
-  "content_in_root": true,
-  "render_readme": true
+  "name": "Room Heating – Better Thermostat Wochenplan",
+  "render_readme": true,
+  "homeassistant": "2024.11.0",
+  "zip_release": false
 }
