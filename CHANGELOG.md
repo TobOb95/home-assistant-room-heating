@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.2
+
+- Heizstatus und Zeitplanphase in der Wochenkarte klarer darstellen.
+- Wochenplan nach Werktagen und Wochenende gruppieren; einzelne Tage bleiben separat bearbeitbar.
+- Ist-Temperatur und Thermostat-Sollwert eindeutig beschriften.
+- Speichern-Schaltfläche nur bei Änderungen aktivieren.
+- PNG-Logo für HACS-README und Markenbilder für Home Assistant ergänzen.
+- README um Installations-, Update-, Cache- und Versionsschritte erweitern.
+
 ## 1.0.1
 
 - Zeigt aktuellen Thermostatbetrieb und Zeitplanstatus getrennt an.
