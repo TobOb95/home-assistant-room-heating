@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.3
+
+- Geöffnete Werktags- und Wochenendgruppen bleiben beim Bearbeiten des Zeitplans geöffnet.
+- Eingaben werden bereits während der Bearbeitung übernommen, damit Aktualisierungen den gerade bearbeiteten Wert erhalten.
+- HACS-README verwendet das funktionierende SVG-Logo statt des fehlerhaften PNG-Links.
+
 ## 1.0.2
 
 - Heizstatus und Zeitplanphase in der Wochenkarte klarer darstellen.
