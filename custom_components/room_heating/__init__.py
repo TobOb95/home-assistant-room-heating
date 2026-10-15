@@ -34,7 +34,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         StaticPathConfig(
             "/api/room_heating",
             str(card_path),
-            cache_headers=True,
+            cache_headers=False,
         ),
     ])
 
