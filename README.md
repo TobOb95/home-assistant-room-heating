@@ -26,7 +26,7 @@ Eine eigenständige Home-Assistant-Integration mit eigener Wochenplan-Karte für
 5. Wähle einen Namen und die vorhandene Better-Thermostat-Climate-Entität.
 6. Füge die Kartendatei als Dashboard-Ressource hinzu, falls sie nicht bereits registriert wurde:
 
-   `/api/room_heating/room-heating-card.js?v=3.0.0`
+   `/api/room_heating/room-heating-card.js?v=0.0.0`
 
    Ressourcentyp: **JavaScript-Modul**.
 
@@ -41,6 +41,8 @@ entity: sensor.wohnzimmer_heiz_solltemperatur
 
 Beim visuellen Hinzufügen der Karte kannst du den Raum im Editor auswählen. Der Editor zeigt Better-Thermostat-Raumtemperatur und Sollwert; darunter lassen sich Wochentage und Heizphasen einrichten. Mit **+ Phase** fügst du eine weitere Phase hinzu. Der Schiebeschalter in einer Zeile pausiert nur diese Heizphase. **Speichern** übernimmt Zeitplan und Temperaturen gemeinsam.
 
+Ab Home Assistant 2026.6 kann die Karte beim Hinzufügen aus einer Climate-Entität als Vorschlag erscheinen, wenn dieses Thermostat bereits in Room Heating eingerichtet ist. Bei älteren Home-Assistant-Versionen kannst du den Raum weiterhin im Karteneditor auswählen. Nicht zugeordnete Climate-Entitäten können noch keinen Room-Heating-Wochenplan öffnen.
+
 ## Verhalten des Zeitplans
 
 Die aktive Heizphase mit passendem Wochentag und aktueller Uhrzeit bestimmt den Sollwert. Außerhalb aktivierter Phasen gilt die Eco-Temperatur. Bei eingeschaltetem Urlaubsmodus gilt die Urlaubstemperatur. Better Thermostat bleibt für Regelung und Thermostatfunktionen zuständig; Room Heating übergibt nur den Sollwert an die gewählte Climate-Entität.
@@ -49,7 +51,7 @@ Die aktive Heizphase mit passendem Wochentag und aktueller Uhrzeit bestimmt den 
 
 ## Migration von der bisherigen Version
 
-Room Heating speichert die vorhandenen Einstellungen in der Integration. Beim Update auf 3.0.0 werden die gespeicherten Wochenpläne weiterverwendet. Ältere Heizphasen ohne Freigabe-Feld gelten automatisch als aktiviert. Ein Zeitblock mit `enabled: false` bleibt pausiert.
+Room Heating speichert die vorhandenen Einstellungen in der Integration. Die neue Entwicklungsbasis beginnt mit Version 0.0.0; vorhandene Konfigurationen werden weiterverwendet. Ältere Heizphasen ohne Freigabe-Feld gelten automatisch als aktiviert. Ein Zeitblock mit `enabled: false` bleibt pausiert.
 
 Falls zusätzlich Scheduler Card oder Scheduler Component installiert sind, entferne oder deaktiviere deren Zeitpläne für dieselben Thermostate, bevor Room Heating den Sollwert übernimmt.
 
