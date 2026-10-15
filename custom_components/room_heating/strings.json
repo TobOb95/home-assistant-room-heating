@@ -1,0 +1,43 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Room Heating einrichten",
+        "description": "Wähle einen Raum und den zugehörigen Climate-Thermostat.",
+        "data": {
+          "room_name": "Raumname",
+          "climate_entity": "Thermostat",
+          "comfort_temperature": "Komforttemperatur",
+          "eco_temperature": "Eco-Temperatur"
+        }
+      }
+    },
+    "error": {
+      "invalid_schedule": "Der Wochenplan ist ungültig.",
+      "invalid_climate": "Bitte eine Climate-Entität auswählen."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Room Heating Einstellungen",
+        "description": "Temperaturen und Wochenplan bearbeiten.",
+        "data": {
+          "comfort_temperature": "Komforttemperatur",
+          "eco_temperature": "Eco-Temperatur",
+          "vacation_temperature": "Urlaubstemperatur",
+          "day_0": "Montag",
+          "day_1": "Dienstag",
+          "day_2": "Mittwoch",
+          "day_3": "Donnerstag",
+          "day_4": "Freitag",
+          "day_5": "Samstag",
+          "day_6": "Sonntag"
+        }
+      }
+    },
+    "error": {
+      "invalid_schedule": "Der Wochenplan ist ungültig."
+    }
+  }
+}
