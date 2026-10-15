@@ -58,9 +58,6 @@ class RoomHeatingConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return RoomHeatingOptionsFlow(config_entry)
 
 class RoomHeatingOptionsFlow(config_entries.OptionsFlow):
-    def __init__(self, config_entry):
-        self.config_entry = config_entry
-
     async def async_step_init(self, user_input=None):
         current = {**self.config_entry.data, **self.config_entry.options}
         schedule = current.get(CONF_SCHEDULE, DEFAULT_SCHEDULE)
