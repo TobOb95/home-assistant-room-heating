@@ -1,12 +1,15 @@
-/* Room Heating Scheduler visual weekly card - v2.2.1 */
+/* Room Heating Scheduler visual weekly card - v2.2.2 */
 
 class RoomHeatingSchedulerCard extends HTMLElement {
   constructor() {
     super();
+
     this.attachShadow({ mode: "open" });
+
     this._config = {};
     this._schedule = {};
     this._dirty = false;
+    this._hass = null;
   }
 
   setConfig(config) {
@@ -17,11 +20,13 @@ class RoomHeatingSchedulerCard extends HTMLElement {
     }
 
     this._config = config;
+
     this.render();
   }
 
   set hass(hass) {
     this._hass = hass;
+
     this.render();
   }
 
@@ -38,15 +43,17 @@ class RoomHeatingSchedulerCard extends HTMLElement {
 
     for (let i = 0; i < 7; i++) {
       out[String(i)] = (schedule?.[String(i)] || []).map((p) => ({
-        ...p,
+        start: p.start,
+        end: p.end,
+        temperature: Number(p.temperature),
       }));
     }
 
     return out;
   }
 
-  _escape(s) {
-    return String(s ?? "")
+  _escape(value) {
+    return String(value ?? "")
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
@@ -69,16 +76,21 @@ class RoomHeatingSchedulerCard extends HTMLElement {
           </div>
         </ha-card>
       `;
+
       return;
     }
 
+    /*
+     * Nur beim ersten Rendern bzw. wenn nichts ungespeichert ist,
+     * den Zeitplan aus der HA-Entity übernehmen.
+     */
     if (!this._dirty) {
       this._schedule = this._cloneSchedule(
-        state.attributes.schedule
+        state.attributes?.schedule
       );
     }
 
-    const a = state.attributes;
+    const attributes = state.attributes || {};
 
     const days = [
       "Montag",
@@ -97,13 +109,12 @@ class RoomHeatingSchedulerCard extends HTMLElement {
           <div>
             <b>
               ${this._escape(
-                a.room_name || "Room Heating"
+                attributes.room_name || "Room Heating"
               )}
             </b>
 
             <div class="sub">
-              Wochenplan ·
-              ${this._escape(state.state)}
+              Wochenplan · ${this._escape(state.state)}
             </div>
           </div>
 
@@ -122,7 +133,7 @@ class RoomHeatingSchedulerCard extends HTMLElement {
               min="5"
               max="30"
               step="0.5"
-              value="${a.comfort_temperature ?? 21}"
+              value="${attributes.comfort_temperature ?? 21}"
             >
             °C
           </label>
@@ -135,7 +146,7 @@ class RoomHeatingSchedulerCard extends HTMLElement {
               min="5"
               max="30"
               step="0.5"
-              value="${a.eco_temperature ?? 17}"
+              value="${attributes.eco_temperature ?? 17}"
             >
             °C
           </label>
@@ -148,13 +159,17 @@ class RoomHeatingSchedulerCard extends HTMLElement {
               min="5"
               max="25"
               step="0.5"
-              value="${a.vacation_temperature ?? 16}"
+              value="${attributes.vacation_temperature ?? 16}"
             >
             °C
           </label>
 
           <button id="vacbtn">
-            ${a.vacation ? "Urlaub AUS" : "Urlaub AN"}
+            ${
+              attributes.vacation
+                ? "Urlaub AUS"
+                : "Urlaub AN"
+            }
           </button>
 
         </div>
@@ -167,10 +182,7 @@ class RoomHeatingSchedulerCard extends HTMLElement {
         <section>
 
           <div class="dayhead">
-
-            <b>
-              ${day}
-            </b>
+            <b>${day}</b>
 
             <button
               class="add"
@@ -178,21 +190,20 @@ class RoomHeatingSchedulerCard extends HTMLElement {
             >
               + Phase
             </button>
-
           </div>
       `;
 
-      (
-        this._schedule[String(idx)] || []
-      ).forEach((p, j) => {
+      const periods = this._schedule[String(idx)] || [];
+
+      periods.forEach((period, index) => {
         html += `
           <div class="period">
 
             <input
               class="start"
               data-day="${idx}"
-              data-i="${j}"
-              value="${this._escape(p.start)}"
+              data-i="${index}"
+              value="${this._escape(period.start)}"
               type="time"
             >
 
@@ -201,16 +212,16 @@ class RoomHeatingSchedulerCard extends HTMLElement {
             <input
               class="end"
               data-day="${idx}"
-              data-i="${j}"
-              value="${this._escape(p.end)}"
+              data-i="${index}"
+              value="${this._escape(period.end)}"
               type="time"
             >
 
             <input
               class="temp"
               data-day="${idx}"
-              data-i="${j}"
-              value="${this._escape(p.temperature)}"
+              data-i="${index}"
+              value="${this._escape(period.temperature)}"
               type="number"
               min="5"
               max="30"
@@ -222,7 +233,8 @@ class RoomHeatingSchedulerCard extends HTMLElement {
             <button
               class="del"
               data-day="${idx}"
-              data-i="${j}"
+              data-i="${index}"
+              title="Phase löschen"
             >
               ×
             </button>
@@ -231,9 +243,7 @@ class RoomHeatingSchedulerCard extends HTMLElement {
         `;
       });
 
-      if (
-        !(this._schedule[String(idx)] || []).length
-      ) {
+      if (!periods.length) {
         html += `
           <div class="empty">
             Keine Komfortphase (Eco aktiv)
@@ -248,9 +258,20 @@ class RoomHeatingSchedulerCard extends HTMLElement {
 
     html += `
         </div>
+
       </ha-card>
     `;
 
+    /*
+     * WICHTIG:
+     * Hier muss ${html} verwendet werden.
+     *
+     * Die alte Version verwendete:
+     * ${this.shadowRoot.innerHTML}
+     *
+     * Dadurch konnten die Buttons fehlen und
+     * getElementById("save") null zurückgeben.
+     */
     this.shadowRoot.innerHTML = `
       <style>
 
@@ -266,6 +287,7 @@ class RoomHeatingSchedulerCard extends HTMLElement {
           display: flex;
           justify-content: space-between;
           align-items: center;
+          gap: 12px;
           padding: 16px;
           font-size: 18px;
         }
@@ -283,6 +305,10 @@ class RoomHeatingSchedulerCard extends HTMLElement {
           background: var(--primary-color);
           color: var(--text-primary-color);
           cursor: pointer;
+        }
+
+        button:hover {
+          opacity: 0.85;
         }
 
         .temps {
@@ -317,6 +343,7 @@ class RoomHeatingSchedulerCard extends HTMLElement {
           display: flex;
           justify-content: space-between;
           align-items: center;
+          gap: 8px;
           margin: 8px 0;
         }
 
@@ -377,77 +404,108 @@ class RoomHeatingSchedulerCard extends HTMLElement {
       ${html}
     `;
 
-     this._bind();
+    this._bind();
   }
 
-   _bind() {
-    const root = this.shadowRoot;
+  _bind() {
+    /*
+     * + Phase
+     */
+    this.shadowRoot
+      .querySelectorAll(".add")
+      .forEach((button) => {
+        button.onclick = () => {
+          const day = button.dataset.day;
 
-    if (!root) {
-      return;
-    }
+          if (!this._schedule[day]) {
+            this._schedule[day] = [];
+          }
 
-    root.querySelectorAll(".add").forEach((button) => {
-      button.onclick = () => {
-        const day = button.dataset.day;
+          this._schedule[day].push({
+            start: "17:00",
+            end: "22:00",
+            temperature: 21,
+          });
 
-        (this._schedule[day] ||= []).push({
-          start: "17:00",
-          end: "22:00",
-          temperature: 21,
-        });
+          this._dirty = true;
 
-        this._dirty = true;
-        this.render();
-      };
-    });
+          this.render();
+        };
+      });
 
-    root.querySelectorAll(".del").forEach((button) => {
-      button.onclick = () => {
-        const day = button.dataset.day;
-        const index = Number(button.dataset.i);
+    /*
+     * Phase löschen
+     */
+    this.shadowRoot
+      .querySelectorAll(".del")
+      .forEach((button) => {
+        button.onclick = () => {
+          const day = button.dataset.day;
+          const index = Number(button.dataset.i);
 
-        if (!this._schedule[day]) {
-          return;
-        }
+          if (!this._schedule[day]) {
+            return;
+          }
 
-        this._schedule[day].splice(index, 1);
+          this._schedule[day].splice(index, 1);
 
-        this._dirty = true;
-        this.render();
-      };
-    });
+          this._dirty = true;
 
-    root.querySelectorAll("input[data-day]").forEach((input) => {
-      input.onchange = () => {
-        const day = input.dataset.day;
-        const index = Number(input.dataset.i);
+          this.render();
+        };
+      });
 
-        const period = this._schedule[day]?.[index];
+    /*
+     * Eingaben in den Zeitplan
+     */
+    this.shadowRoot
+      .querySelectorAll("input[data-day]")
+      .forEach((input) => {
+        input.onchange = () => {
+          const day = input.dataset.day;
+          const index = Number(input.dataset.i);
 
-        if (!period) {
-          return;
-        }
+          if (!this._schedule[day]) {
+            return;
+          }
 
-        if (input.classList.contains("start")) {
-          period.start = input.value;
-        } else if (input.classList.contains("end")) {
-          period.end = input.value;
-        } else {
-          period.temperature = Number(input.value);
-        }
+          const period = this._schedule[day][index];
 
-        this._dirty = true;
-      };
-    });
+          if (!period) {
+            return;
+          }
 
-    const saveButton = root.getElementById("save");
+          if (input.classList.contains("start")) {
+            period.start = input.value;
+          } else if (input.classList.contains("end")) {
+            period.end = input.value;
+          } else if (input.classList.contains("temp")) {
+            period.temperature = Number(input.value);
+          }
+
+          this._dirty = true;
+        };
+      });
+
+    /*
+     * Speichern
+     *
+     * Null-sicher, damit kein Fehler wie
+     * "Cannot set properties of null"
+     * entstehen kann.
+     */
+    const saveButton =
+      this.shadowRoot.getElementById("save");
 
     if (saveButton) {
       saveButton.onclick = () => this._save();
     }
 
-    const vacationButton = root.getElementById("vacbtn");
+    /*
+     * Urlaub AN/AUS
+     */
+    const vacationButton =
+      this.shadowRoot.getElementById("vacbtn");
 
     if (vacationButton) {
       vacationButton.onclick = async () => {
@@ -457,41 +515,89 @@ class RoomHeatingSchedulerCard extends HTMLElement {
           return;
         }
 
-        await this._hass.callService(
-          "room_heating",
-          "set_vacation",
-          {
-            entry_id: state.attributes.entry_id,
-            enabled: !state.attributes.vacation,
-          }
-        );
+        const entryId =
+          state.attributes?.entry_id;
 
-        this._dirty = false;
-        this.render();
+        if (!entryId) {
+          alert(
+            "Keine Room-Heating entry_id gefunden."
+          );
+
+          return;
+        }
+
+        try {
+          await this._hass.callService(
+            "room_heating",
+            "set_vacation",
+            {
+              entry_id: entryId,
+              enabled:
+                !state.attributes?.vacation,
+            }
+          );
+
+          this._dirty = false;
+
+          this.render();
+        } catch (error) {
+          console.error(
+            "Room Heating: Urlaub konnte nicht geändert werden.",
+            error
+          );
+
+          alert(
+            "Urlaubsmodus konnte nicht geändert werden."
+          );
+        }
       };
     }
   }
+
   async _save() {
+    const state = this._getEntity();
 
-    const s = this._getEntity();
-    const a = s.attributes;
+    if (!state) {
+      alert(
+        "Room-Heating-Sensor wurde nicht gefunden."
+      );
 
-    for (
-      const d of Object.keys(this._schedule)
-    ) {
+      return;
+    }
 
-      for (
-        const p of this._schedule[d]
-      ) {
+    const attributes = state.attributes || {};
+
+    /*
+     * Zeitplan validieren
+     */
+    for (const day of Object.keys(this._schedule)) {
+      for (const period of this._schedule[day]) {
+
+        const validStart =
+          /^\d{2}:\d{2}$/.test(period.start);
+
+        const validEnd =
+          /^\d{2}:\d{2}$/.test(period.end);
+
+        const startMinutes =
+          this._timeToMinutes(period.start);
+
+        const endMinutes =
+          this._timeToMinutes(period.end);
+
+        const temperature =
+          Number(period.temperature);
 
         if (
-          !/^\d\d:\d\d$/.test(p.start) ||
-          !/^\d\d:\d\d$/.test(p.end) ||
-          p.start >= p.end ||
-          Number(p.temperature) < 5 ||
-          Number(p.temperature) > 30
+          !validStart ||
+          !validEnd ||
+          startMinutes === null ||
+          endMinutes === null ||
+          startMinutes >= endMinutes ||
+          Number.isNaN(temperature) ||
+          temperature < 5 ||
+          temperature > 30
         ) {
-
           alert(
             "Bitte Zeitbereiche und Temperaturen prüfen."
           );
@@ -501,61 +607,180 @@ class RoomHeatingSchedulerCard extends HTMLElement {
       }
     }
 
-    await this._hass.callService(
-      "room_heating",
-      "set_schedule",
-      {
-        entry_id: a.entry_id,
-        schedule: this._schedule,
-      }
-    );
+    /*
+     * Temperaturen aus den Eingabefeldern lesen
+     */
+    const comfortInput =
+      this.shadowRoot.getElementById("comfort");
 
-    await this._hass.callService(
-      "room_heating",
-      "set_temperatures",
-      {
-        entry_id: a.entry_id,
-        comfort_temperature:
-          Number(
-            this.shadowRoot
-              .getElementById("comfort")
-              .value
-          ),
-        eco_temperature:
-          Number(
-            this.shadowRoot
-              .getElementById("eco")
-              .value
-          ),
-        vacation_temperature:
-          Number(
-            this.shadowRoot
-              .getElementById("vac")
-              .value
-          ),
-      }
-    );
+    const ecoInput =
+      this.shadowRoot.getElementById("eco");
 
-    this._dirty = false;
+    const vacationInput =
+      this.shadowRoot.getElementById("vac");
 
-    this.render();
+    if (
+      !comfortInput ||
+      !ecoInput ||
+      !vacationInput
+    ) {
+      alert(
+        "Temperatureinstellungen konnten nicht gelesen werden."
+      );
+
+      return;
+    }
+
+    const comfortTemperature =
+      Number(comfortInput.value);
+
+    const ecoTemperature =
+      Number(ecoInput.value);
+
+    const vacationTemperature =
+      Number(vacationInput.value);
+
+    /*
+     * Temperaturwerte validieren
+     */
+    if (
+      Number.isNaN(comfortTemperature) ||
+      comfortTemperature < 5 ||
+      comfortTemperature > 30
+    ) {
+      alert(
+        "Die Komforttemperatur muss zwischen 5 und 30 °C liegen."
+      );
+
+      return;
+    }
+
+    if (
+      Number.isNaN(ecoTemperature) ||
+      ecoTemperature < 5 ||
+      ecoTemperature > 30
+    ) {
+      alert(
+        "Die Eco-Temperatur muss zwischen 5 und 30 °C liegen."
+      );
+
+      return;
+    }
+
+    if (
+      Number.isNaN(vacationTemperature) ||
+      vacationTemperature < 5 ||
+      vacationTemperature > 25
+    ) {
+      alert(
+        "Die Urlaubstemperatur muss zwischen 5 und 25 °C liegen."
+      );
+
+      return;
+    }
+
+    const entryId =
+      attributes.entry_id;
+
+    if (!entryId) {
+      alert(
+        "Keine Room-Heating entry_id gefunden."
+      );
+
+      return;
+    }
+
+    /*
+     * Änderungen an Home Assistant senden
+     */
+    try {
+      await this._hass.callService(
+        "room_heating",
+        "set_schedule",
+        {
+          entry_id: entryId,
+          schedule: this._schedule,
+        }
+      );
+
+      await this._hass.callService(
+        "room_heating",
+        "set_temperatures",
+        {
+          entry_id: entryId,
+          comfort_temperature:
+            comfortTemperature,
+          eco_temperature:
+            ecoTemperature,
+          vacation_temperature:
+            vacationTemperature,
+        }
+      );
+
+      this._dirty = false;
+
+      this.render();
+
+    } catch (error) {
+      console.error(
+        "Room Heating: Speichern fehlgeschlagen.",
+        error
+      );
+
+      alert(
+        "Die Einstellungen konnten nicht gespeichert werden."
+      );
+    }
+  }
+
+  _timeToMinutes(value) {
+    if (
+      typeof value !== "string" ||
+      !/^\d{2}:\d{2}$/.test(value)
+    ) {
+      return null;
+    }
+
+    const [hours, minutes] =
+      value.split(":").map(Number);
+
+    if (
+      hours < 0 ||
+      hours > 23 ||
+      minutes < 0 ||
+      minutes > 59
+    ) {
+      return null;
+    }
+
+    return hours * 60 + minutes;
   }
 }
 
-customElements.define(
-  "room-heating-scheduler-card",
-  RoomHeatingSchedulerCard
-);
+if (
+  !customElements.get(
+    "room-heating-scheduler-card"
+  )
+) {
+  customElements.define(
+    "room-heating-scheduler-card",
+    RoomHeatingSchedulerCard
+  );
+}
 
 window.customCards =
   window.customCards || [];
 
 window.customCards.push({
   type: "room-heating-scheduler-card",
+
   name: "Room Heating Wochenplan",
+
   description:
     "Visueller Wochenplan für Room Heating Scheduler",
+
   preview: true,
+
   documentationURL:
     "https://github.com/TobOb95/home-assistant-room-heating",
 });
