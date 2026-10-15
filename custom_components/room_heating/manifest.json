@@ -1,0 +1,14 @@
+{
+  "domain": "room_heating",
+  "name": "Room Heating",
+  "version": "2.1.0",
+  "documentation": "https://github.com/",
+  "codeowners": [],
+  "config_flow": true,
+  "iot_class": "local_push",
+  "requirements": [],
+  "dependencies": [
+    "frontend",
+    "http"
+  ]
+}
