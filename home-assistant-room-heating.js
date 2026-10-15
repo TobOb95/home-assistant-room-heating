@@ -86,7 +86,7 @@ class BetterThermostatRoomCard extends HTMLElement {
     const title = this._escape(this._config.name || attrs.friendly_name || entityId);
     const current = this._temperature(attrs.current_temperature);
     const target = this._temperature(attrs.temperature);
-    const humidity = Number(attrs.humidity);
+    const humidity = attrs.humidity === null || attrs.humidity === undefined || attrs.humidity === "" ? NaN : Number(attrs.humidity);
     const details = [];
     if (attrs.window_open === true) details.push("<span class='chip warning'>Fenster offen</span>");
     if (Number.isFinite(humidity)) details.push("<span class='chip'>Luftfeuchte " + Math.round(humidity) + " %</span>");
