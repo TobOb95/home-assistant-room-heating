@@ -26,7 +26,7 @@ Eine eigenständige Home-Assistant-Integration mit eigener Wochenplan-Karte für
 5. Wähle einen Namen und die vorhandene Better-Thermostat-Climate-Entität.
 6. Füge die Kartendatei als Dashboard-Ressource hinzu, falls sie nicht bereits registriert wurde:
 
-   `/api/room_heating/room-heating-card.js?v=0.0.0`
+   `/api/room_heating/room-heating-card.js?v=1.0.0`
 
    Ressourcentyp: **JavaScript-Modul**.
 
@@ -51,7 +51,7 @@ Die aktive Heizphase mit passendem Wochentag und aktueller Uhrzeit bestimmt den 
 
 ## Migration von der bisherigen Version
 
-Room Heating speichert die vorhandenen Einstellungen in der Integration. Die neue Entwicklungsbasis beginnt mit Version 0.0.0; vorhandene Konfigurationen werden weiterverwendet. Ältere Heizphasen ohne Freigabe-Feld gelten automatisch als aktiviert. Ein Zeitblock mit `enabled: false` bleibt pausiert.
+Room Heating speichert die vorhandenen Einstellungen in der Integration. Die neue Entwicklungsbasis beginnt mit Version 1.0.0; vorhandene Konfigurationen werden weiterverwendet. Ältere Heizphasen ohne Freigabe-Feld gelten automatisch als aktiviert. Ein Zeitblock mit `enabled: false` bleibt pausiert.
 
 Falls zusätzlich Scheduler Card oder Scheduler Component installiert sind, entferne oder deaktiviere deren Zeitpläne für dieselben Thermostate, bevor Room Heating den Sollwert übernimmt.
 
