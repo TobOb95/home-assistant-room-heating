@@ -7,7 +7,12 @@ class BetterThermostatScheduleCardEditor extends HTMLElement {
     this._hass = null;
   }
   setConfig(config) { this._config = { ...config }; this._render(); }
-  set hass(hass) { this._hass = hass; this._render(); }
+  set hass(hass) {
+    this._hass = hass;
+    const form = this.shadowRoot.querySelector("ha-form");
+    if (form) form.hass = hass;
+    else this._render();
+  }
   _render() {
     if (!this._hass) return;
     const form = document.createElement("ha-form");
@@ -164,10 +169,14 @@ class BetterThermostatScheduleCard extends HTMLElement {
       this.shadowRoot.getElementById(id).onclick = async () => {
         const value = Number(attrs.temperature);
         if (!Number.isFinite(value)) return;
-        await this._hass.callService("climate", "set_temperature", {
-          entity_id: cfg.climate_entity,
-          temperature: Math.round((value + delta) * 2) / 2,
-        });
+        try {
+          await this._hass.callService("climate", "set_temperature", {
+            entity_id: cfg.climate_entity,
+            temperature: Math.round((value + delta) * 2) / 2,
+          });
+        } catch (error) {
+          console.error("Solltemperatur konnte nicht geändert werden", error);
+        }
       };
     }
     this.shadowRoot.getElementById("open-schedule").onclick = () => {
