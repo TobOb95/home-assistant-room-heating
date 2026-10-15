@@ -1,5 +1,9 @@
 # Room Heating Scheduler
 
+<p align="center">
+  <img src="assets/room-heating-logo.svg" alt="Logo: Haus mit Wärmezeichen und Wochenplan" width="180">
+</p>
+
 Raumweise Heizungssteuerung für Home Assistant mit Wochenplan, Komfort-/Eco-/Urlaubstemperatur und visueller Lovelace-Karte.
 
 ## Status
