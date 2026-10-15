@@ -53,10 +53,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             CONF_SCHEDULE: schedule,
         }
 
-        hass.config_entries.async_update_entry(
-            coordinator.entry,
-            options=options,
-        )
+        coordinator.update_options(options)
 
         await coordinator.async_update()
 
@@ -74,10 +71,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             ),
         }
 
-        hass.config_entries.async_update_entry(
-            coordinator.entry,
-            options=options,
-        )
+        coordinator.update_options(options)
 
         await coordinator.async_update()
 
@@ -97,7 +91,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             CONF_ECO: call.data["eco_temperature"],
             CONF_VACATION_TEMP: call.data["vacation_temperature"],
         }
-        hass.config_entries.async_update_entry(coordinator.entry, options=options)
+        coordinator.update_options(options)
         await coordinator.async_update()
 
     async def set_vacation(call: ServiceCall) -> None:
@@ -112,10 +106,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             CONF_VACATION: enabled,
         }
 
-        hass.config_entries.async_update_entry(
-            coordinator.entry,
-            options=options,
-        )
+        coordinator.update_options(options)
 
         coordinator.vacation = enabled
         await coordinator.async_update()
@@ -200,6 +191,9 @@ async def async_setup_entry(
 
 async def _async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Reload after options are changed in the config flow."""
+    coordinator = hass.data.get(DOMAIN, {}).get(entry.entry_id)
+    if coordinator is None or coordinator.options_snapshot == dict(entry.options):
+        return
     await hass.config_entries.async_reload(entry.entry_id)
 
 
