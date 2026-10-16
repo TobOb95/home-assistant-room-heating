@@ -41,6 +41,7 @@ class TargetSensor(Base):
             "vacation_temperature": o.get(CONF_VACATION_TEMP, 16),
             "vacation": self.coordinator.vacation,
             "schedule_status": self.coordinator.status,
+            "manual_override": bool((self.coordinator.data or {}).get("manual_override", False)),
             "schedule": self.coordinator.schedule(),
         }
 
