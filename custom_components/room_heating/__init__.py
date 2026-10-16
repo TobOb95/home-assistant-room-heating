@@ -176,10 +176,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         set_manual_temperature,
         schema=vol.Schema({
             vol.Required("entry_id"): str,
-            vol.Required("temperature"): vol.All(
-                vol.Coerce(float),
-                vol.Range(min=5, max=30),
-            ),
+            vol.Required("temperature"): vol.Coerce(float),
         }),
     )
 
