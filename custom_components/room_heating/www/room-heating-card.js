@@ -223,7 +223,6 @@ class RoomHeatingSchedulerCard extends HTMLElement {
     const setpoint = climateAttributes.temperature;
     const minimumTarget = Number(climateAttributes.min_temp ?? 5);
     const maximumTarget = Number(climateAttributes.max_temp ?? 30);
-    const adjustmentStep = Number(climateAttributes.target_temp_step) || 0.5;
     const manualOverride = Boolean(attributes.manual_override);
     const action = climateAttributes.hvac_action;
     const heating = action === "heating";
