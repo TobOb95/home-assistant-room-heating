@@ -62,21 +62,44 @@ class RoomHeatingSchedulerCardEditor extends HTMLElement {
 
     const form = this.shadowRoot.querySelector("ha-form");
     form.hass = this._hass;
-    form.schema = [{
-      name: "entity",
-      required: true,
-      selector: {
-        select: {
-          mode: "dropdown",
-          options,
+    form.schema = [
+      {
+        name: "entity",
+        required: true,
+        selector: {
+          select: {
+            mode: "dropdown",
+            options,
+          },
         },
       },
-    }];
-    form.data = { entity: selectedEntity };
-    form.computeLabel = (schema) => schema.name === "entity" ? "Heizungsraum" : undefined;
+      {
+        name: "window_entities",
+        selector: {
+          entity: {
+            multiple: true,
+            filter: [
+              { domain: "binary_sensor", device_class: "window" },
+              { domain: "binary_sensor", device_class: "opening" },
+            ],
+          },
+        },
+      },
+    ];
+    form.data = {
+      entity: selectedEntity,
+      window_entities: this._config.window_entities || [],
+    };
+    form.computeLabel = (schema) => schema.name === "entity"
+      ? "Heizungsraum"
+      : schema.name === "window_entities"
+        ? "Fensterkontakte (optional)"
+        : undefined;
     form.computeHelper = (schema) => schema.name === "entity"
       ? "Wähle den Raum, dessen Wochenplan diese Karte anzeigen und bearbeiten soll."
-      : undefined;
+      : schema.name === "window_entities"
+        ? "Wähle Fensterkontakte aus. Die Karte zeigt an, wenn mindestens ein ausgewähltes Fenster offen ist."
+        : undefined;
 
     form.addEventListener("value-changed", (event) => {
       const config = { ...this._config, ...event.detail.value };
@@ -220,6 +243,27 @@ class RoomHeatingSchedulerCard extends HTMLElement {
     const attributes = state.attributes || {};
     const climate = this._hass.states[attributes.climate_entity];
     const climateAttributes = climate?.attributes || {};
+    const configuredWindowEntities = Array.isArray(this._config.window_entities)
+      ? this._config.window_entities
+      : [];
+    const windowStates = configuredWindowEntities.map((entityId) => ({
+      entityId,
+      state: this._hass.states[entityId],
+    }));
+    const openWindowNames = windowStates
+      .filter(({ state }) => state?.state === "on")
+      .map(({ entityId, state }) => state.attributes?.friendly_name || entityId);
+    const windowStatusUnknown = windowStates.some(({ state }) =>
+      !state || state.state === "unknown" || state.state === "unavailable"
+    );
+    const windowStatusText = openWindowNames.length
+      ? `Fenster offen: ${openWindowNames.join(", ")}`
+      : windowStatusUnknown
+        ? "Fensterstatus nicht verfügbar"
+        : configuredWindowEntities.length
+          ? "Alle Fenster geschlossen"
+          : "";
+    const windowStatusClass = openWindowNames.length ? "open" : "";
     const setpoint = climateAttributes.temperature;
     const minimumTarget = Number(climateAttributes.min_temp ?? 5);
     const maximumTarget = Number(climateAttributes.max_temp ?? 30);
@@ -287,6 +331,7 @@ class RoomHeatingSchedulerCard extends HTMLElement {
                   <span class="status-dot"></span>${this._escape(heatingStatus)}
                 </span>
                 <span class="schedule-status">${this._escape(profileStatus)}${this._escape(scheduleTemperatureLabel)}</span>
+                ${windowStatusText ? `<span class="window-status ${windowStatusClass}">${this._escape(windowStatusText)}</span>` : ""}
               </div>
             </div>
           </div>
@@ -297,7 +342,7 @@ class RoomHeatingSchedulerCard extends HTMLElement {
               <span class="target">Sollwert ${setpoint == null ? "—" : Number(setpoint).toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " °C"}</span>
               <button class="adjust" data-delta="1" aria-label="Solltemperatur erhöhen" ${setpoint == null || Number(setpoint) >= maximumTarget ? "disabled" : ""}>+</button>
             </div>
-            ${manualOverride ? "<span class=\"manual-hint\">Manuell bis zur nächsten Phase</span>" : ""}
+            ${manualOverride ? `<span class="manual-hint">${attributes.vacation ? "Manuell bis Urlaubsmodus endet" : "Manuell bis zur nächsten Phase"}</span>` : ""}
           </div>
           <button id="save" class="save" ${this._dirty ? "" : "disabled"}>${this._dirty ? "Änderungen speichern" : "Gespeichert"}</button>
         </div>
@@ -508,6 +553,8 @@ class RoomHeatingSchedulerCard extends HTMLElement {
         .status-dot { width:8px; height:8px; border-radius:50%; background:var(--disabled-text-color); }
         .heating-status.heating .status-dot { background:var(--success-color, #43a047); box-shadow:0 0 0 3px color-mix(in srgb, var(--success-color, #43a047) 20%, transparent); }
         .schedule-status { color:var(--primary-color); font-size:12px; font-weight:600; padding:4px 8px; border-radius:999px; background:color-mix(in srgb, var(--primary-color) 12%, transparent); }
+        .window-status { color:var(--success-color, #2e7d32); font-size:12px; font-weight:600; padding:4px 8px; border-radius:999px; background:color-mix(in srgb, var(--success-color, #2e7d32) 12%, transparent); }
+        .window-status.open { color:var(--error-color, #c62828); background:color-mix(in srgb, var(--error-color, #c62828) 14%, transparent); }
         .day-group { border-bottom:1px solid var(--divider-color); }
         .day-group > summary { display:flex; align-items:center; gap:12px; padding:14px 10px; cursor:pointer; font-weight:600; list-style:none; }
         .day-group > summary::-webkit-details-marker { display:none; }
