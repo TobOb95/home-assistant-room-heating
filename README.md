@@ -15,7 +15,7 @@ Room Heating ergänzt Home Assistant um eine Integration mit Wochenplänen und e
 - Urlaubsmodus mit Statusanzeige
 - Ist-Temperatur, Thermostat-Sollwert, Heizbetrieb und aktive Zeitplanphase auf der Karte
 - Solltemperatur direkt auf der Karte mit Plus/Minus anpassen (temporär bis zum nächsten Zeitplanwechsel)
-- Optional ausgewählte Fensterkontakte mit Offen-/Geschlossen-Status anzeigen
+- Fensterstatus automatisch von Better Thermostat anzeigen; bei anderen Climate-Entitäten optional Fensterkontakte auswählen
 - Mehrere Räume und Thermostate in einem Dashboard
 
 Für jeden Raum richtest du einen eigenen Room-Heating-Eintrag ein und fügst eine eigene Karte hinzu. Der Raum verwendet die von dir ausgewählte Climate-Entität.
@@ -46,7 +46,7 @@ Wiederhole die Einrichtung für jeden Raum, den du verwalten möchtest. Wähle d
 
 1. Öffne das gewünschte Dashboard und wähle **Bearbeiten → Karte hinzufügen**.
 2. Suche nach **Room Heating Wochenplan**.
-3. Wähle den Raum aus und speichere die Karte. Im Karteneditor kannst du zusätzlich passende Fensterkontakte auswählen; das ist optional.
+3. Wähle den Raum aus und speichere die Karte. Bei Better Thermostat wird ein dort eingerichteter Fensterkontakt automatisch angezeigt. Für andere Climate-Entitäten kannst du im Karteneditor optional Fensterkontakte auswählen.
 
 Wenn die Karte nicht in der Auswahl erscheint, prüfe **Einstellungen → Dashboards → Ressourcen**. Die JavaScript-Ressource soll einmal als **JavaScript-Modul** eingetragen sein:
 
@@ -74,7 +74,7 @@ Ab Home Assistant 2026.6 kann der Karteneditor außerdem einen passenden Raum vo
 - Bei aktivem Urlaubsmodus gilt die Urlaubstemperatur.
 - Room Heating übergibt den Sollwert an die ausgewählte Climate-Entität. Diese Entität beziehungsweise ihre Thermostat-Integration übernimmt die eigentliche Regelung.
 - Mit Plus/Minus gesetzte manuelle Sollwerte gelten bis zum nächsten Wechsel der aktiven Zeitplanphase. Bei aktivem Urlaubsmodus gelten sie bis der Urlaubsmodus beendet wird. Danach übernimmt wieder der Zeitplan.
-- Fensterkontakte dienen nur der Statusanzeige. Sie pausieren die Heizung nicht automatisch.
+- Bei Better Thermostat zeigt die Karte dessen Fensterstatus an. Better Thermostat muss dafür selbst mit einem Fensterkontakt konfiguriert sein; es schaltet das Thermostat bei offenem Fenster ab und nach dem Schließen wieder ein. Bei anderen Climate-Entitäten zeigt Room Heating ausgewählte Fensterkontakte nur an und pausiert die Heizung nicht.
 
 Du kannst Zeitpläne, Temperaturen und den Urlaubsmodus auf der Karte bearbeiten. Änderungen werden erst übernommen, wenn du sie speicherst. Vermeide eine zusätzliche Automation, die gleichzeitig den Sollwert derselben Climate-Entität verändert.
 
