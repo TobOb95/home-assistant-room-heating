@@ -6,7 +6,7 @@
 
 Room Heating ergänzt Home Assistant um eine Integration mit Wochenplänen und einer Dashboard-Karte. Du kannst vorhandene Thermostate aus Home Assistant verwenden, zum Beispiel Climate-Entitäten von Better Thermostat. Room Heating erstellt keine zusätzlichen Thermostate.
 
-**Aktuelle Version: 1.0.4** · [Alle Releases ansehen](https://github.com/TobOb95/home-assistant-room-heating/releases)
+**Aktuelle Version: 1.0.5** · [Alle Releases ansehen](https://github.com/TobOb95/home-assistant-room-heating/releases)
 
 ## Was die Integration bietet
 
@@ -14,6 +14,8 @@ Room Heating ergänzt Home Assistant um eine Integration mit Wochenplänen und e
 - Komfort-, Eco- und Urlaubstemperatur pro Raum
 - Urlaubsmodus mit Statusanzeige
 - Ist-Temperatur, Thermostat-Sollwert, Heizbetrieb und aktive Zeitplanphase auf der Karte
+- Solltemperatur direkt auf der Karte mit Plus/Minus anpassen (temporär bis zum nächsten Zeitplanwechsel)
+- Optional ausgewählte Fensterkontakte mit Offen-/Geschlossen-Status anzeigen
 - Mehrere Räume und Thermostate in einem Dashboard
 
 Für jeden Raum richtest du einen eigenen Room-Heating-Eintrag ein und fügst eine eigene Karte hinzu. Der Raum verwendet die von dir ausgewählte Climate-Entität.
@@ -44,7 +46,7 @@ Wiederhole die Einrichtung für jeden Raum, den du verwalten möchtest. Wähle d
 
 1. Öffne das gewünschte Dashboard und wähle **Bearbeiten → Karte hinzufügen**.
 2. Suche nach **Room Heating Wochenplan**.
-3. Wähle den Raum aus und speichere die Karte.
+3. Wähle den Raum aus und speichere die Karte. Im Karteneditor kannst du zusätzlich passende Fensterkontakte auswählen; das ist optional.
 
 Wenn die Karte nicht in der Auswahl erscheint, prüfe **Einstellungen → Dashboards → Ressourcen**. Die JavaScript-Ressource soll einmal als **JavaScript-Modul** eingetragen sein:
 
@@ -52,13 +54,15 @@ Wenn die Karte nicht in der Auswahl erscheint, prüfe **Einstellungen → Dashbo
 /api/room_heating/room-heating-card.js
 ```
 
-Wenn bereits eine ältere Room-Heating-Ressource mit einem Versionszusatz wie `?v=1.0.4` eingetragen ist, bearbeite sie und entferne den gesamten Zusatz ab `?`. Lege keinen doppelten Ressourceneintrag an. Die feste Adresse bleibt auch nach künftigen Updates gleich. Lade danach das Dashboard neu.
+Wenn bereits eine ältere Room-Heating-Ressource mit einem Versionszusatz wie `?v=1.0.5` eingetragen ist, bearbeite sie und entferne den gesamten Zusatz ab `?`. Lege keinen doppelten Ressourceneintrag an. Die feste Adresse bleibt auch nach künftigen Updates gleich. Lade danach das Dashboard neu.
 
 Eine YAML-Karte ist ebenfalls möglich. Ersetze die Beispiel-Entity durch den Heiz-Solltemperatursensor des gewünschten Room-Heating-Raums:
 
 ```yaml
 type: custom:room-heating-scheduler-card
 entity: sensor.wohnzimmer_heiz_solltemperatur
+window_entities:
+  - binary_sensor.wohnzimmer_fenster
 ```
 
 Ab Home Assistant 2026.6 kann der Karteneditor außerdem einen passenden Raum vorschlagen, wenn du zuerst dessen Heiz-Solltemperatursensor auswählst.
@@ -69,6 +73,8 @@ Ab Home Assistant 2026.6 kann der Karteneditor außerdem einen passenden Raum vo
 - Außerhalb der aktivierten Heizphasen gilt die Eco-Temperatur.
 - Bei aktivem Urlaubsmodus gilt die Urlaubstemperatur.
 - Room Heating übergibt den Sollwert an die ausgewählte Climate-Entität. Diese Entität beziehungsweise ihre Thermostat-Integration übernimmt die eigentliche Regelung.
+- Mit Plus/Minus gesetzte manuelle Sollwerte gelten bis zum nächsten Wechsel der aktiven Zeitplanphase. Bei aktivem Urlaubsmodus gelten sie bis der Urlaubsmodus beendet wird. Danach übernimmt wieder der Zeitplan.
+- Fensterkontakte dienen nur der Statusanzeige. Sie pausieren die Heizung nicht automatisch.
 
 Du kannst Zeitpläne, Temperaturen und den Urlaubsmodus auf der Karte bearbeiten. Änderungen werden erst übernommen, wenn du sie speicherst. Vermeide eine zusätzliche Automation, die gleichzeitig den Sollwert derselben Climate-Entität verändert.
 
@@ -83,6 +89,6 @@ Du musst die Integration oder Räume für ein normales Update nicht entfernen un
 
 ## Version und Lizenz
 
-HACS zeigt die neueste veröffentlichte GitHub-Version anhand des Release-Tags an, zum Beispiel `v1.0.4`. Die Versionsnummer in der Integrationsdatei allein veröffentlicht kein HACS-Update.
+HACS zeigt die neueste veröffentlichte GitHub-Version anhand des Release-Tags an, zum Beispiel `v1.0.5`. Die Versionsnummer in der Integrationsdatei allein veröffentlicht kein HACS-Update.
 
 Die [individuelle Nutzungslizenz](LICENSE) erlaubt die private, nicht kommerzielle Nutzung der unveränderten Originalversion. Änderungen, die Nutzung veränderter Versionen und Weitergabe außerhalb der GitHub-Repository- und Fork-Funktionen sind nicht erlaubt. GitHub-Forks bleiben im Rahmen der GitHub-Nutzungsbedingungen möglich.
