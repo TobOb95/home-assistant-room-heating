@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.5
+
+- Temperatur direkt auf der Karte mit Plus/Minus-Schaltflächen anpassen; manuelle Änderungen gelten bis zum nächsten Zeitplanwechsel.
+- Optional Fensterkontakte auswählen und den Offen-/Geschlossen-Status anzeigen.
+
 ## 1.0.3
 
 - Geöffnete Werktags- und Wochenendgruppen bleiben beim Bearbeiten des Zeitplans geöffnet.
