@@ -94,6 +94,27 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         coordinator.update_options(options)
         await coordinator.async_update()
 
+    async def set_manual_temperature(call: ServiceCall) -> None:
+        """Apply a temporary thermostat target until the next schedule slot."""
+        coordinator = hass.data.get(DOMAIN, {}).get(call.data["entry_id"])
+        if coordinator is None:
+            return
+
+        climate_entity = coordinator.opts[CONF_CLIMATE]
+        climate_state = hass.states.get(climate_entity)
+        if climate_state is None or climate_state.state in ("unknown", "unavailable"):
+            raise vol.Invalid("The selected thermostat is unavailable")
+
+        temperature = float(call.data["temperature"])
+        minimum = float(climate_state.attributes.get("min_temp", 5))
+        maximum = float(climate_state.attributes.get("max_temp", 30))
+        if not minimum <= temperature <= maximum:
+            raise vol.Invalid(
+                f"Temperature must be between {minimum:g} and {maximum:g}"
+            )
+
+        await coordinator.async_set_manual_temperature(temperature)
+
     async def set_vacation(call: ServiceCall) -> None:
         coordinator = hass.data.get(DOMAIN, {}).get(call.data["entry_id"])
         if coordinator is None:
@@ -146,6 +167,19 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
             vol.Required("comfort_temperature"): vol.All(vol.Coerce(float), vol.Range(min=5, max=30)),
             vol.Required("eco_temperature"): vol.All(vol.Coerce(float), vol.Range(min=5, max=30)),
             vol.Required("vacation_temperature"): vol.All(vol.Coerce(float), vol.Range(min=5, max=25)),
+        }),
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        "set_manual_temperature",
+        set_manual_temperature,
+        schema=vol.Schema({
+            vol.Required("entry_id"): str,
+            vol.Required("temperature"): vol.All(
+                vol.Coerce(float),
+                vol.Range(min=5, max=30),
+            ),
         }),
     )
 
