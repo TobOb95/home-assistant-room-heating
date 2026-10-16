@@ -36,6 +36,8 @@ class RoomHeatingCoordinator(DataUpdateCoordinator):
         self.vacation = bool(entry.options.get(CONF_VACATION, False))
         self.options_snapshot = dict(entry.options)
         self.last_target = None
+        self.manual_target = None
+        self.manual_context = None
         self.status = "unknown"
 
     @property
@@ -73,8 +75,45 @@ class RoomHeatingCoordinator(DataUpdateCoordinator):
             options.get(CONF_VACATION_TEMP, 16),
         )
 
+    def _target_context(self, now=None):
+        """Identify the current schedule slot so manual changes expire at its end."""
+        now = now or dt_util.now()
+        options = self.opts
+        if self.vacation:
+            return ("vacation", float(options.get(CONF_VACATION_TEMP, 16)))
+
+        day_periods = self.schedule().get(str(now.weekday()), [])
+        current_time = now.strftime("%H:%M")
+        for index, period in enumerate(day_periods):
+            if (
+                period.get("enabled", True)
+                and period["start"] <= current_time < period["end"]
+            ):
+                return (
+                    "comfort",
+                    now.weekday(),
+                    index,
+                    period["start"],
+                    period["end"],
+                    float(period["temperature"]),
+                )
+
+        return ("eco", float(options.get(CONF_ECO, 17)))
+
+    async def async_set_manual_temperature(self, temperature):
+        """Apply a temporary target until the active schedule slot changes."""
+        self.manual_target = float(temperature)
+        self.manual_context = self._target_context()
+        await self.async_update()
+
     async def async_update(self, now=None):
-        target, status = self.target_temperature(now)
+        now = now or dt_util.now()
+        scheduled_target, status = self.target_temperature(now)
+        context = self._target_context(now)
+        if self.manual_target is not None and context != self.manual_context:
+            self.manual_target = None
+            self.manual_context = None
+        target = self.manual_target if self.manual_target is not None else scheduled_target
         climate_entity = self.opts[CONF_CLIMATE]
         state = self.hass.states.get(climate_entity)
 
@@ -83,6 +122,7 @@ class RoomHeatingCoordinator(DataUpdateCoordinator):
             self.async_set_updated_data({
                 "target": target,
                 "status": "unavailable",
+                "manual_override": self.manual_target is not None,
             })
             return
 
@@ -108,6 +148,7 @@ class RoomHeatingCoordinator(DataUpdateCoordinator):
             self.async_set_updated_data({
                 "target": target,
                 "status": status,
+                "manual_override": self.manual_target is not None,
             })
             self.status = status
 
@@ -119,6 +160,7 @@ class RoomHeatingCoordinator(DataUpdateCoordinator):
             self.async_set_updated_data({
                 "target": target,
                 "status": "error",
+                "manual_override": self.manual_target is not None,
             })
             self.status = "error"
 
