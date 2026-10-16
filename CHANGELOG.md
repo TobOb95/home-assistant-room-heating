@@ -3,7 +3,7 @@
 ## 1.0.5
 
 - Temperatur direkt auf der Karte mit Plus/Minus-Schaltflächen anpassen; manuelle Änderungen gelten bis zum nächsten Zeitplanwechsel.
-- Optional Fensterkontakte auswählen und den Offen-/Geschlossen-Status anzeigen.
+- Better-Thermostat-Fensterstatus automatisch anzeigen; bei anderen Climate-Entitäten optional Fensterkontakte auswählen.
 
 ## 1.0.3
 
