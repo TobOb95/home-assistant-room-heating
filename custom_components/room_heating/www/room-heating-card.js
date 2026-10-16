@@ -220,6 +220,11 @@ class RoomHeatingSchedulerCard extends HTMLElement {
     const attributes = state.attributes || {};
     const climate = this._hass.states[attributes.climate_entity];
     const climateAttributes = climate?.attributes || {};
+    const setpoint = climateAttributes.temperature;
+    const minimumTarget = Number(climateAttributes.min_temp ?? 5);
+    const maximumTarget = Number(climateAttributes.max_temp ?? 30);
+    const adjustmentStep = Number(climateAttributes.target_temp_step) || 0.5;
+    const manualOverride = Boolean(attributes.manual_override);
     const action = climateAttributes.hvac_action;
     const heating = action === "heating";
     const currentTemperature = climateAttributes.current_temperature;
@@ -288,7 +293,12 @@ class RoomHeatingSchedulerCard extends HTMLElement {
           </div>
           <div class="hero-temp">
             <span>Ist-Temperatur</span><strong>${currentTemperature == null ? "—" : Number(currentTemperature).toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " °C"}</strong>
-            <span class="target">Thermostat-Sollwert ${climateAttributes.temperature == null ? "—" : Number(climateAttributes.temperature).toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " °C"}</span>
+            <div class="target-control">
+              <button class="adjust" data-delta="-1" aria-label="Solltemperatur senken" ${setpoint == null || Number(setpoint) <= minimumTarget ? "disabled" : ""}>−</button>
+              <span class="target">Sollwert ${setpoint == null ? "—" : Number(setpoint).toLocaleString("de-DE", { maximumFractionDigits: 1 }) + " °C"}</span>
+              <button class="adjust" data-delta="1" aria-label="Solltemperatur erhöhen" ${setpoint == null || Number(setpoint) >= maximumTarget ? "disabled" : ""}>+</button>
+            </div>
+            ${manualOverride ? "<span class=\"manual-hint\">Manuell bis zur nächsten Phase</span>" : ""}
           </div>
           <button id="save" class="save" ${this._dirty ? "" : "disabled"}>${this._dirty ? "Änderungen speichern" : "Gespeichert"}</button>
         </div>
@@ -513,7 +523,11 @@ class RoomHeatingSchedulerCard extends HTMLElement {
         .hero-temp { display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
         .hero-temp span { color:var(--secondary-text-color); font-size:11px; text-transform:uppercase; letter-spacing:.05em; }
         .hero-temp strong { color:var(--primary-text-color); font-size:22px; }
-        .hero-temp .target { text-transform:none; letter-spacing:0; }
+        .target-control { display:flex; align-items:center; justify-content:flex-end; gap:8px; }
+        .hero-temp .target { color:var(--secondary-text-color); font-size:12px; text-transform:none; letter-spacing:0; }
+        button.adjust { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; padding:0; border-radius:50%; font-size:21px; line-height:1; }
+        button.adjust:disabled { opacity:.35; cursor:default; }
+        .manual-hint { color:var(--primary-color); font-size:11px; }
         .save { align-self:flex-start; }
         .save:disabled { opacity:.62; cursor:default; }
 
@@ -733,6 +747,10 @@ class RoomHeatingSchedulerCard extends HTMLElement {
       };
     });
 
+    this.shadowRoot.querySelectorAll(".adjust").forEach((button) => {
+      button.onclick = () => this._adjustTarget(Number(button.dataset.delta));
+    });
+
     /*
      * Speichern
      *
@@ -797,6 +815,37 @@ class RoomHeatingSchedulerCard extends HTMLElement {
           );
         }
       };
+    }
+  }
+
+  async _adjustTarget(delta) {
+    const state = this._getEntity();
+    const climateId = state?.attributes?.climate_entity;
+    const climate = this._hass?.states?.[climateId];
+    const climateAttributes = climate?.attributes || {};
+    if (!state || climateAttributes.temperature == null) return;
+
+    const current = Number(climateAttributes.temperature);
+    const step = Number(climateAttributes.target_temp_step) || 0.5;
+    const minimum = Number(climateAttributes.min_temp ?? 5);
+    const maximum = Number(climateAttributes.max_temp ?? 30);
+    const target = Math.min(
+      maximum,
+      Math.max(minimum, Math.round((current + delta * step) * 100) / 100)
+    );
+    if (Math.abs(target - current) < 0.01) return;
+
+    const entryId = state.attributes?.entry_id;
+    if (!entryId) return;
+
+    try {
+      await this._hass.callService("room_heating", "set_manual_temperature", {
+        entry_id: entryId,
+        temperature: target,
+      });
+    } catch (error) {
+      console.error("Room Heating: Temperatur konnte nicht angepasst werden.", error);
+      alert("Die Solltemperatur konnte nicht angepasst werden.");
     }
   }
 
