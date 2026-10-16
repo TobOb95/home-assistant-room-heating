@@ -253,17 +253,23 @@ class RoomHeatingSchedulerCard extends HTMLElement {
     const openWindowNames = windowStates
       .filter(({ state }) => state?.state === "on")
       .map(({ entityId, state }) => state.attributes?.friendly_name || entityId);
+    const thermostatWindowOpen = typeof climateAttributes.window_open === "boolean"
+      ? climateAttributes.window_open
+      : null;
     const windowStatusUnknown = windowStates.some(({ state }) =>
       !state || state.state === "unknown" || state.state === "unavailable"
     );
-    const windowStatusText = openWindowNames.length
-      ? `Fenster offen: ${openWindowNames.join(", ")}`
-      : windowStatusUnknown
+    const anyWindowOpen = openWindowNames.length > 0 || thermostatWindowOpen === true;
+    const windowStatusText = anyWindowOpen
+      ? openWindowNames.length
+        ? `Fenster offen: ${openWindowNames.join(", ")}`
+        : "Fenster offen (Better Thermostat)"
+      : windowStatusUnknown && thermostatWindowOpen === null
         ? "Fensterstatus nicht verfügbar"
-        : configuredWindowEntities.length
+        : configuredWindowEntities.length || thermostatWindowOpen !== null
           ? "Alle Fenster geschlossen"
           : "";
-    const windowStatusClass = openWindowNames.length ? "open" : "";
+    const windowStatusClass = anyWindowOpen ? "open" : "";
     const setpoint = climateAttributes.temperature;
     const minimumTarget = Number(climateAttributes.min_temp ?? 5);
     const maximumTarget = Number(climateAttributes.max_temp ?? 30);
